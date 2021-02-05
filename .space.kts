@@ -5,7 +5,7 @@ job("Test and Build") {
 
    container("node:15-alpine3.10") {
          shellScript {
-            interpreter = "/bin/bash"
+            interpreter = "/bin/ash"
             content = """
                 yarn
                 yarn build
