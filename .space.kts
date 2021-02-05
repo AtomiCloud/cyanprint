@@ -4,6 +4,7 @@ job("Test and Build") {
     }
 
     docker {
+
         build {
             context = "."
             file = "./Dockerfile"
@@ -12,22 +13,24 @@ job("Test and Build") {
             labels["module"] = "cli"
         }
 
+
+
         push("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies") {
-            tag = "\${JB_SPACE_GIT_BRANCH}-\${JB_SPACE_GIT_REVISION}"
+            tag = "\${JB_SPACE_EXECUTION_NUMBER}"
         }
     }
 
 
     parallel {
         // test
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_GIT_BRANCH}-\${JB_SPACE_GIT_REVISION}") {
+        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_EXECUTION_NUMBER}") {
              shellScript {
                 content = "yarn test --cover"
             }
         }
 
          // build
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_GIT_BRANCH}-\${JB_SPACE_GIT_REVISION}") {
+        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_EXECUTION_NUMBER}") {
              shellScript {
                 content = "yarn build"
             }
