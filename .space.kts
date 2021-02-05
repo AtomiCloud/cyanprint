@@ -23,14 +23,14 @@ job("Test and Build") {
 
     parallel {
         // test
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_EXECUTION_NUMBER}") {
+        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:${JB_SPACE_EXECUTION_NUMBER}") {
              shellScript {
                 content = "yarn test --cover"
             }
         }
 
          // build
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:\${JB_SPACE_EXECUTION_NUMBER}") {
+        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:${JB_SPACE_EXECUTION_NUMBER}") {
              shellScript {
                 content = "yarn build"
             }
