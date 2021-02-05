@@ -3,40 +3,17 @@ job("Test and Build") {
         gitPush { enabled = true }
     }
 
-    docker {
-
-        build {
-            context = "."
-            file = "./Dockerfile"
-            labels["platform"] = "cyanprint"
-            labels["service"] = "tool"
-            labels["module"] = "cli"
+   container("node:15-alpine3.10") {
+         shellScript {
+            interpreter = "/bin/bash"
+            content = """
+                yarn
+                yarn build
+                yarn test --cover
+            """
         }
 
-
-
-        push("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies") {
-            tag = "\${JB_SPACE_EXECUTION_NUMBER}"
-        }
-    }
-
-
-    parallel {
-        // test
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:${JB_SPACE_EXECUTION_NUMBER}") {
-             shellScript {
-                content = "yarn test --cover"
-            }
-        }
-
-         // build
-        container("atomicloud.registry.jetbrains.space/p/cyanprint/cyanprint/dependencies:${JB_SPACE_EXECUTION_NUMBER}") {
-             shellScript {
-                content = "yarn build"
-            }
-        }
-    }
-
+   }
 
 
 }
