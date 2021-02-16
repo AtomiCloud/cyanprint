@@ -1,42 +1,43 @@
 {
-  "name":         "cyanprint",
-  "version":      "0.14.0",
-  "description":  "Templating engine to generate and scaffold production ready code",
-  "main":         "dist/cyan.js",
-  "license":      "MIT",
-  "author":       {
-    "name":  "kirinnee",
+  "name": "cyanprint",
+  "version": "0.14.0",
+  "description": "Templating engine to generate and scaffold production ready code",
+  "main": "dist/cyan.js",
+  "license": "MIT",
+  "author": {
+    "name": "kirinnee",
     "email": "kirinnee@gmail.com"
   },
-  "types":        "./types/cyan.d.ts",
-  "bin":          {
+  "types": "./types/cyan.d.ts",
+  "bin": {
     "cyan.js": "dist/cyan.js"
   },
-  "repository":   {
+  "repository": {
     "type": "git",
-    "url":  "ssh://git@git.jetbrains.space/atomicloud/cyanprint/cyanprint-cli.git"
+    "url": "ssh://git@git.jetbrains.space/atomicloud/cyanprint/cyanprint-cli.git"
   },
-  "scripts":      {
-    "deploy":   "node script deploy",
-    "build":    "node script wp dist",
-    "dev":      "node script wp dist -w",
-    "test":     "node script test",
-    "test:w":   "node script test -w",
+  "scripts": {
+    "deploy": "node script deploy",
+    "build": "node script wp dist",
+    "dev": "node script wp dist -w",
+    "test": "node script test",
+    "test:w": "node script test -w",
     "coverage": "node script test --cover",
-    "patch":    "node script publish patch",
-    "minor":    "node script publish minor",
-    "major":    "node script publish major",
-    "start":    "node dist/cyan"
+    "patch": "node script publish patch",
+    "minor": "node script publish minor",
+    "major": "node script publish major",
+    "start": "node dist/cyan"
   },
   "dependencies": {
     "@kirinnee/core": "^0.7.5",
-    "axios":          "^0.21.1",
-    "chalk":          "^4.1.0",
-    "commander":      "^7.0.0",
-    "glob":           "^7.1.6",
-    "graceful-fs":    "^4.2.4",
-    "inquirer":       "^7.3.3",
-    "rimraf":         "^3.0.2"
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "commander": "^7.0.0",
+    "glob": "^7.1.6",
+    "graceful-fs": "^4.2.4",
+    "inquirer": "^7.3.3",
+    "rimraf": "^3.0.2",
+    "ts-union": "^2.3.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.6",
