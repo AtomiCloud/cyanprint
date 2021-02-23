@@ -5,8 +5,8 @@ type Syntax = [string,string] // [open, close] , [ ["~", "~"] , ["{{"], ["}}"]]
 interface CyanObject {
 	globs: Glob[] | Glob;
 	copyOnly: Glob[] | Glob; // Doesn't go through parser
-	variable: object;
-	flags: object;
+	variable: object; // { a: "Roses", b: { c: "Violets", d: "please" } }
+	flags: object; // { remove: { one: true, two: false } }
 	guid: string[] | string; // ["asdf-asdf-asdf-asdf", "1234'1234'1234"]
 	syntax: Syntax[] | Syntax;
 	plugins: { [s: string]: string[] }; // {"api.cyanprint.dev": ["npm, c#", "github"]}
@@ -89,4 +89,5 @@ export {
 	IGlobFactory,
 	IFileFactory,
 	IParsingStrategy,
+	FileContent
 };
