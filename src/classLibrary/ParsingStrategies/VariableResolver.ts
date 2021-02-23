@@ -17,4 +17,4 @@ class VariableResolver implements IParsingStrategy {
 }
 
 const variableResolver = new VariableResolver();
-export {variableResolver};
+export { variableResolver, VariableResolver };
