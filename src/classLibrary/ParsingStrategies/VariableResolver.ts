@@ -1,4 +1,4 @@
-import { CyanSafe, FileSystemInstance, IFileSystemInstanceMetadata, IParsingStrategy } from "../interfaces/cyan";
+import { CyanSafe, FileSystemInstance, IFileSystemInstanceMetadata, IParsingStrategy } from "../interfaces/interfaces";
 
 class VariableResolver implements IParsingStrategy {
 

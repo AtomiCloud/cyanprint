@@ -1,18 +1,17 @@
 import { should } from 'chai';
-import { VariableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
+import { variableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
 import {
     CyanSafe,
     FileContent,
     FileSystemInstance,
     IFileSystemInstanceMetadata
-} from "../../src/classLibrary/interfaces/cyan";
+} from "../../src/classLibrary/interfaces/interfaces";
 import { Core, Kore, SortType } from "@kirinnee/core";
 
 should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
-let variableParser: VariableResolver = new VariableResolver();
 let variables: object = {
     a: "Roses",
     b: {
@@ -86,7 +85,7 @@ describe("VariableResolver", () => {
                 ["g", 4]
             ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
 
-            let actual: [string, number][] = variableParser.Count(testCyanSafe, testSubject)
+            let actual: [string, number][] = variableResolver.Count(testCyanSafe, testSubject)
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
