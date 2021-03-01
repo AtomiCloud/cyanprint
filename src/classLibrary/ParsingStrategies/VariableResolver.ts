@@ -19,10 +19,6 @@ class VariableResolver implements IParsingStrategy {
         this.util = util;
     }
 
-    ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[] {
-        throw new Error("Method not implemented.");
-    }
-
     Count(cyan: CyanSafe, files: FileSystemInstance[]): Map<string, number> {
         const variables: string[] = this.util.FlattenObject(cyan.variable).Keys();
         const result: Map<string, number> = new Map<string, number>();
@@ -56,10 +52,14 @@ class VariableResolver implements IParsingStrategy {
         throw new Error("Method not implemented.");
     }
 
-    private ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
+    ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[] {
+        throw new Error("Method not implemented.");
+    }
+
+    ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
         const allPossibleVariables: string[] = [];
         syntaxes.map(syntax => {
-            allPossibleVariables.push(`${syntax[0] + v + syntax[1]}`);
+            allPossibleVariables.push(`var${syntax[0] + v + syntax[1]}`);
         })
         return allPossibleVariables;
     }
