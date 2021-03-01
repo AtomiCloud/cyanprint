@@ -1,9 +1,6 @@
-import { Core, Kore } from "@kirinnee/core";
 import program from "commander";
 import { InstallController } from "./controller/install_controller";
 
-export let core: Core = new Kore();
-core.ExtendPrimitives();
 
 declare  global {
 	const VERSION: string

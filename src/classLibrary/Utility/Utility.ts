@@ -1,6 +1,5 @@
 import chalk from "chalk";
-import { core } from "../../cyan";
-import { Core } from "@kirinnee/core";
+import { Core, Kore } from "@kirinnee/core";
 
 export class Utility {
     public readonly c: Core;
@@ -40,5 +39,8 @@ export class Utility {
         return ret;
     }
 }
+
+export let core: Core = new Kore();
+core.ExtendPrimitives();
 
 export const utility = new Utility(core);
