@@ -1,5 +1,4 @@
 import { should } from 'chai';
-import { variableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
 import {
     CyanSafe,
     FileContent,
@@ -7,11 +6,15 @@ import {
     IFileSystemInstanceMetadata
 } from "../../src/classLibrary/interfaces/interfaces";
 import { Core, Kore, SortType } from "@kirinnee/core";
+import { Utility } from "../../src/classLibrary/Utility/Utility";
+import { VariableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
 
 should();
 let core: Core = new Kore();
+const utility: Utility = new Utility(core);
 core.ExtendPrimitives();
 
+const variableResolver: VariableResolver = new VariableResolver(utility);
 let variables: object = {
     a: "Roses",
     b: {

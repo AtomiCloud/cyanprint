@@ -6,11 +6,7 @@ import {
     IParsingStrategy,
     Syntax
 } from "../interfaces/interfaces";
-import { Core, Kore } from "@kirinnee/core";
-import { utility, Utility } from "../Utility/Utility";
-
-let core: Core = new Kore();
-core.ExtendPrimitives();
+import { Utility } from "../Utility/Utility";
 
 class VariableResolver implements IParsingStrategy {
     private util: Utility;
@@ -65,5 +61,4 @@ class VariableResolver implements IParsingStrategy {
     }
 }
 
-const variableResolver = new VariableResolver(utility);
-export { variableResolver, VariableResolver };
+export { VariableResolver };

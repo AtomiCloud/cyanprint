@@ -1,11 +1,11 @@
 import chalk from "chalk";
-import { Core, Kore } from "@kirinnee/core";
+import { Core } from "@kirinnee/core";
 
 export class Utility {
     public readonly c: Core;
 
     constructor(core: Core) {
-        if (!core.IsExtended) throw "Core needs to be extended";
+        core.AssertExtend();
         this.c = core;
     }
 
@@ -39,8 +39,3 @@ export class Utility {
         return ret;
     }
 }
-
-export let core: Core = new Kore();
-core.ExtendPrimitives();
-
-export const utility = new Utility(core);
