@@ -20,10 +20,10 @@ class VariableResolver implements IParsingStrategy {
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        files.map((f: FileSystemInstance) => {
-            variables.map((v: string) => {
+        files.Each((f: FileSystemInstance) => {
+            variables.Each((v: string) => {
                 const allPossibleVariables = this.ModifyVariablesWithAllSyntax(v, syntaxes);
-                allPossibleVariables.map((key: string) => {
+                allPossibleVariables.Each((key: string) => {
                     let count: number = f.parse ? f.metadata.destinationAbsolutePath.Count(key) : 0;
 
                     if (f["content"] != null) {
@@ -54,7 +54,7 @@ class VariableResolver implements IParsingStrategy {
 
     ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
         const allPossibleVariables: string[] = [];
-        syntaxes.map(syntax => {
+        syntaxes.Each(syntax => {
             allPossibleVariables.push(`var${syntax[0] + v + syntax[1]}`);
         })
         return allPossibleVariables;

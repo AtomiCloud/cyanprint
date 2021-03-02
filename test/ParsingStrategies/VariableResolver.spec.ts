@@ -11,9 +11,9 @@ import { VariableResolver } from "../../src/classLibrary/ParsingStrategies/Varia
 
 should();
 let core: Core = new Kore();
-const utility: Utility = new Utility(core);
 core.ExtendPrimitives();
 
+const utility: Utility = new Utility(core);
 const variableResolver: VariableResolver = new VariableResolver(utility);
 let variables: object = {
     a: "Roses",
