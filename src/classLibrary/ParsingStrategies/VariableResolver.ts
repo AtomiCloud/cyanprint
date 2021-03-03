@@ -49,7 +49,15 @@ class VariableResolver implements IParsingStrategy {
     }
 
     ResolveFiles(cyan: CyanSafe, files: IFileSystemInstanceMetadata[]): IFileSystemInstanceMetadata[] {
-        throw new Error("Method not implemented.");
+        const variables: Map<string, string> = this.util.FlattenObject(cyan.variable);
+
+        return files.Each((file: IFileSystemInstanceMetadata) => {
+            variables
+                .MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax))
+                .Each((allSyntaxes: string[], val: string) => {
+                    allSyntaxes.Map((syntax: string) => file.destinationAbsolutePath = file.destinationAbsolutePath.ReplaceAll(syntax, val));
+                });
+        });
     }
 
     ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[] {
