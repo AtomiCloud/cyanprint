@@ -207,6 +207,54 @@ describe("VariableResolver", () => {
             let actual = variableResolver.ResolveFiles(testCyanSafe, testSubjects);
             actual.should.deep.equal(expected)
         });
+
+        it("should rename the file destinations with multi-syntax correctly", () => {
+            let path1: string = "root/var~a~/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+
+            let path2: string = "root/var{b.c}/var{g}";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+
+            let path3: string = "root/var#b.d.e#/var#g#";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+
+            let testSubjects = [fileMeta1, fileMeta2, fileMeta3];
+
+            let fileMeta1Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var~a~/a.a",
+                destinationAbsolutePath: "root/Roses/a.a",
+                relativePath: "root/var~a~/a.a",
+            }
+
+            let fileMeta2Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var{b.c}/var{g}",
+                destinationAbsolutePath: "root/Violets/Oreos",
+                relativePath: "root/var{b.c}/var{g}",
+            }
+
+            let fileMeta3Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var#b.d.e#/var#g#",
+                destinationAbsolutePath: "root/please/Oreos",
+                relativePath: "root/var#b.d.e#/var#g#",
+            }
+
+            let expected = [fileMeta1Expected, fileMeta2Expected, fileMeta3Expected];
+
+            let actual = variableResolver.ResolveFiles(testCyanSafeMultiSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
     });
 
     describe("ResolveContents", () => {
