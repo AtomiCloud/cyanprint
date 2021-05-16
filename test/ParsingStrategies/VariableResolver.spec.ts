@@ -308,7 +308,7 @@ describe("VariableResolver", () => {
 
             let file2Expected: FileSystemInstance = {
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nplease help me!\nViolets are blue\nOreos are black!!!"),
+                content: FileContent.String("line2\nplease help me!\nViolets are blue\nOreos are black!!"),
                 parse: true,
             };
 

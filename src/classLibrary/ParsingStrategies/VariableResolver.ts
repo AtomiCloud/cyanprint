@@ -57,7 +57,23 @@ class VariableResolver implements IParsingStrategy {
     }
 
     ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[] {
-        throw new Error("Method not implemented.");
+        const variablesMap: Map<string, string> = this.util.FlattenObject(cyan.variable);
+        const allPossibleVariablesMap: Map<string[], string> = variablesMap.MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax));
+
+        return files.Each((file: FileSystemInstance) => {
+            if (!file.parse) return;
+            if (file["content"] == null) return;
+
+            FileContent.if.String(file.content, (str: string) => {
+                allPossibleVariablesMap
+                    .Each((allSyntaxes: string[], val: string) => {
+                        allSyntaxes.Map((syntax: string) => {
+                            str = str.ReplaceAll(syntax, val);
+                        });
+                    });
+                file.content = FileContent.String(str);
+            });
+        });
     }
 
     ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
