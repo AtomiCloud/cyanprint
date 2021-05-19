@@ -85,7 +85,7 @@ interface IFileFactory {
 interface IParsingStrategy {
 	ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[];
 
-	Count(cyan: CyanSafe, files: FileSystemInstance[]): Map<string, number>;
+	Count(cyan: CyanSafe, files: VirtualFileSystemInstance[]): Map<string, number>;
 
 	ResolveFiles(cyan: CyanSafe, files: IFileSystemInstanceMetadata[]): IFileSystemInstanceMetadata[];
 }

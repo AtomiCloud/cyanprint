@@ -2,9 +2,11 @@ import {
     CyanSafe,
     FileContent,
     FileSystemInstance,
+    FolderSystemInstance,
     IFileSystemInstanceMetadata,
     IParsingStrategy,
-    Syntax
+    Syntax,
+    VirtualFileSystemInstance
 } from "../interfaces/interfaces";
 import { Utility } from "../Utility/Utility";
 
@@ -15,22 +17,31 @@ class VariableResolver implements IParsingStrategy {
         this.util = util;
     }
 
-    Count(cyan: CyanSafe, files: FileSystemInstance[]): Map<string, number> {
+    Count(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): Map<string, number> {
         const variables: string[] = this.util.FlattenObject(cyan.variable).Keys();
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        files.Each((file: FileSystemInstance) => {
+        virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             variables.Each((variable: string) => {
                 const allPossibleVariables = this.ModifyVariablesWithAllSyntax(variable, syntaxes);
                 allPossibleVariables.Each((key: string) => {
-                    let count: number = file.parse ? file.metadata.destinationAbsolutePath.Count(key) : 0;
-
-                    if (file["content"] != null) {
-                        FileContent.if.String(file.content, (str) => {
-                            count += str.Count(key);
-                        });
-                    }
+                    const count = VirtualFileSystemInstance.match(virtualFile, {
+                        File: (file: FileSystemInstance) => {
+                            if (!file.parse) return 0;
+                            let tempCount = file.metadata.destinationAbsolutePath.Count(key);
+                            if (file["content"] != null) {
+                                FileContent.if.String(file.content, (str) => {
+                                    tempCount += str.Count(key);
+                                });
+                            }
+                            return tempCount;
+                        },
+                        Folder: (folder: FolderSystemInstance) => {
+                            return folder.parse ? folder.metadata.destinationAbsolutePath.Count(key) : 0
+                        },
+                        default: () => 0,
+                    });
 
                     if (result.has(variable)) {
                         result.set(variable, result.get(variable)! + count);
