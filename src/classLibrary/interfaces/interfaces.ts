@@ -50,6 +50,18 @@ interface FileSystemInstance {
 	parse: boolean;
 }
 
+interface FolderSystemInstance {
+	metadata: IFileSystemInstanceMetadata;
+	parse: boolean;
+}
+
+const VirtualFileSystemInstance = Union({
+	File: of<FileSystemInstance>(),
+	Folder: of<FolderSystemInstance>(),
+});
+
+type VirtualFileSystemInstance = typeof VirtualFileSystemInstance.T;
+
 interface Glob {
 	root: string;
 	pattern: string[] | string;
@@ -89,5 +101,7 @@ export {
 	IGlobFactory,
 	IFileFactory,
 	IParsingStrategy,
-	FileContent
+	FileContent,
+	FolderSystemInstance,
+	VirtualFileSystemInstance
 };
