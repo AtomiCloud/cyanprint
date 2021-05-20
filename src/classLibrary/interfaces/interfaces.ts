@@ -50,14 +50,14 @@ interface FileSystemInstance {
 	parse: boolean;
 }
 
-interface FolderSystemInstance {
+interface DirectorySystemInstance {
 	metadata: IFileSystemInstanceMetadata;
 	parse: boolean;
 }
 
 const VirtualFileSystemInstance = Union({
 	File: of<FileSystemInstance>(),
-	Folder: of<FolderSystemInstance>(),
+	Folder: of<DirectorySystemInstance>(),
 });
 
 type VirtualFileSystemInstance = typeof VirtualFileSystemInstance.T;
@@ -68,6 +68,7 @@ interface Glob {
 	ignore: string | string[];
 }
 
+// TODO may need further review
 interface IGlobFactory {
 	GenerateFiles(glob: Glob, target: string): IFileSystemInstanceMetadata[];
 
@@ -75,6 +76,7 @@ interface IGlobFactory {
 	ReadFiles(files: IFileSystemInstanceMetadata[], callback?: Function): Promise<FileSystemInstance[]>;
 }
 
+// TODO may need further review
 interface IFileFactory {
 	CreateFileSystemInstance(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
 
@@ -83,11 +85,11 @@ interface IFileFactory {
 }
 
 interface IParsingStrategy {
-	ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[];
+	ResolveContents(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 
 	Count(cyan: CyanSafe, files: VirtualFileSystemInstance[]): Map<string, number>;
 
-	ResolveFiles(cyan: CyanSafe, files: IFileSystemInstanceMetadata[]): IFileSystemInstanceMetadata[];
+	ResolveFiles(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 }
 
 export {
@@ -102,6 +104,6 @@ export {
 	IFileFactory,
 	IParsingStrategy,
 	FileContent,
-	FolderSystemInstance,
+	DirectorySystemInstance,
 	VirtualFileSystemInstance
 };
