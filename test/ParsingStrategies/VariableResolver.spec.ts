@@ -2,7 +2,6 @@ import { should } from 'chai';
 import {
     CyanSafe,
     FileContent,
-    FileSystemInstance,
     IFileSystemInstanceMetadata,
     VirtualFileSystemInstance
 } from "../../src/classLibrary/interfaces/interfaces";
@@ -60,7 +59,7 @@ const testCyanSafeWithMultiCharacterSyntax: CyanSafe = {
     guid: [],
     pluginData: {},
     plugins: {},
-    syntax: [["~", "}"], ["#", "}"], ["{", "#"], ["{~", "~}"], [">{", "}<"]],
+    syntax: [["~~", "}}"], ["##", "}"], ["{{", "#"], ["{~", "~}"], [">{", "}<"], ["${", "}$"], ["`{", "}`"]],
     variable: variables,
 }
 
@@ -174,8 +173,8 @@ describe("VariableResolver", () => {
             actual.should.deep.equal(expected);
         });
 
-        it("should count the number of occurrences of each variable for varying syntaxes", () => {
-            let path1: string = "root/var~a}/a.a";
+        it("should count the number of occurrences of each variable for multi character syntaxes", () => {
+            let path1: string = "root/var~~a}}/a.a";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
                 destinationAbsolutePath: path1,
@@ -183,11 +182,11 @@ describe("VariableResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                content: FileContent.String("line1\nvar~~b.c}} are red\nvar{{b.c# are blue"),
                 parse: true,
             });
 
-            let path2: string = "root/var{~b.c~}/var#g}";
+            let path2: string = "root/var{~b.c~}/var##g}";
             let fileMeta2: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path2,
                 destinationAbsolutePath: path2,
@@ -195,11 +194,11 @@ describe("VariableResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nvar#b.d.e} help me!\nvar{b.c# are blue\nvar>{g}< are black!!"),
+                content: FileContent.String("line2\nvar##b.d.e} help me!\nvar{{b.c# are blue\nvar${g}$ are black!!"),
                 parse: true,
             });
 
-            let path3: string = "root/var{b.d.e#/var#g}";
+            let path3: string = "root/var{{b.d.e#/var>{g}<";
             let fileMeta3: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path3,
                 destinationAbsolutePath: path3,
@@ -207,7 +206,7 @@ describe("VariableResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nvar~b.d.f} are red\nvar{b.c# are blue\nvar{~g~} are black!!"),
+                content: FileContent.String("line2\nvar`{b.d.f}` are red\nvar{{b.c# are blue\nvar{~g~} are black!!"),
                 parse: true,
             });
 
@@ -229,7 +228,7 @@ describe("VariableResolver", () => {
         });
 
         it("should not count variables for files marked to be not parsed", () => {
-            let path1: string = "root/var~a}/a.a";
+            let path1: string = "root/var~~a}}/a.a";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
                 destinationAbsolutePath: path1,
@@ -237,11 +236,11 @@ describe("VariableResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                content: FileContent.String("line1\nvar~~b.c}} are red\nvar{{b.c# are blue"),
                 parse: true,
             });
 
-            let path2: string = "root/var{~b.c~}/var#g}";
+            let path2: string = "root/var{~b.c~}/var##g}";
             let fileMeta2: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path2,
                 destinationAbsolutePath: path2,
@@ -249,11 +248,11 @@ describe("VariableResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nvar#b.d.e} help me!\nvar{b.c# are blue\nvar>{g}< are black!!"),
+                content: FileContent.String("line2\nvar##b.d.e} help me!\nvar{{b.c# are blue\nvar${g}$ are black!!"),
                 parse: true,
             });
 
-            let path3: string = "root/var{b.d.e#/var#g}";
+            let path3: string = "root/var{{b.d.e#/var##g}";
             let fileMeta3: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path3,
                 destinationAbsolutePath: path3,
@@ -261,7 +260,7 @@ describe("VariableResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nvar~b.d.f} are red\nvar{b.c# are blue\nvar{~g~} are black!!"),
+                content: FileContent.String("line2\nvar~~b.d.f}} are red\nvar{{b.c# are blue\nvar{~g~} are black!!"),
                 parse: true,
             });
 
@@ -303,6 +302,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path1,
                 relativePath: path1,
             }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let path2: string = "root/var~b.c~/var~g~";
             let fileMeta2: IFileSystemInstanceMetadata = {
@@ -310,6 +314,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path2,
                 relativePath: path2,
             }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let path3: string = "root/var~b.d.e~/var~g~";
             let fileMeta3: IFileSystemInstanceMetadata = {
@@ -317,28 +326,48 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path3,
                 relativePath: path3,
             }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
-            let testSubjects = [fileMeta1, fileMeta2, fileMeta3];
+            let testSubjects = [file1, file2, file3];
 
             let fileMeta1Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var~a~/a.a",
                 destinationAbsolutePath: "root/Roses/a.a",
                 relativePath: "root/var~a~/a.a",
             }
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let fileMeta2Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var~b.c~/var~g~",
                 destinationAbsolutePath: "root/Violets/Oreos",
                 relativePath: "root/var~b.c~/var~g~",
             }
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let fileMeta3Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var~b.d.e~/var~g~",
                 destinationAbsolutePath: "root/please/Oreos",
                 relativePath: "root/var~b.d.e~/var~g~",
             }
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
-            let expected = [fileMeta1Expected, fileMeta2Expected, fileMeta3Expected];
+            let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafe, testSubjects);
             actual.should.deep.equal(expected)
@@ -351,6 +380,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path1,
                 relativePath: path1,
             }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let path2: string = "root/var{b.c}/var{g}";
             let fileMeta2: IFileSystemInstanceMetadata = {
@@ -358,6 +392,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path2,
                 relativePath: path2,
             }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let path3: string = "root/var#b.d.e#/var#g#";
             let fileMeta3: IFileSystemInstanceMetadata = {
@@ -365,28 +404,204 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path3,
                 relativePath: path3,
             }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
-            let testSubjects = [fileMeta1, fileMeta2, fileMeta3];
+            let testSubjects = [file1, file2, file3];
 
             let fileMeta1Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var~a~/a.a",
                 destinationAbsolutePath: "root/Roses/a.a",
                 relativePath: "root/var~a~/a.a",
             }
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let fileMeta2Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var{b.c}/var{g}",
                 destinationAbsolutePath: "root/Violets/Oreos",
                 relativePath: "root/var{b.c}/var{g}",
             }
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
             let fileMeta3Expected: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: "root/var#b.d.e#/var#g#",
                 destinationAbsolutePath: "root/please/Oreos",
                 relativePath: "root/var#b.d.e#/var#g#",
             }
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
 
-            let expected = [fileMeta1Expected, fileMeta2Expected, fileMeta3Expected];
+            let expected = [file1Expected, file2Expected, file3Expected];
+
+            let actual = variableResolver.ResolveFiles(testCyanSafeMultiSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+
+        it("should rename the file destinations with multi-character syntax correctly", () => {
+            let path1: string = "root/var~~a}}/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let path2: string = "root/var##b.c}/var${g}$";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let path3: string = "root/var{{b.d.e#/var{~g~}";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let testSubjects = [file1, file2, file3];
+
+            let fileMeta1Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var~~a}}/a.a",
+                destinationAbsolutePath: "root/Roses/a.a",
+                relativePath: "root/var~~a}}/a.a",
+            }
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let fileMeta2Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var##b.c}/var${g}$",
+                destinationAbsolutePath: "root/Violets/Oreos",
+                relativePath: "root/var##b.c}/var${g}$",
+            }
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let fileMeta3Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var{{b.d.e#/var{~g~}",
+                destinationAbsolutePath: "root/please/Oreos",
+                relativePath: "root/var{{b.d.e#/var{~g~}",
+            }
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let expected = [file1Expected, file2Expected, file3Expected];
+
+            let actual = variableResolver.ResolveFiles(testCyanSafeWithMultiCharacterSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+
+        it("should not rename file destinations for files indicated as false parse", () => {
+            let path1: string = "root/var~a~/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: false,
+            });
+
+            let path2: string = "root/var{b.c}/var{g}";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let path3: string = "root/var#b.d.e#/var#g#";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: false,
+            });
+
+            let testSubjects = [file1, file2, file3];
+
+            let fileMeta1Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var~a~/a.a",
+                destinationAbsolutePath: "root/var~a~/a.a",
+                relativePath: "root/var~a~/a.a",
+            }
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: false,
+            });
+
+            let fileMeta2Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var{b.c}/var{g}",
+                destinationAbsolutePath: "root/Violets/Oreos",
+                relativePath: "root/var{b.c}/var{g}",
+            }
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: true,
+            });
+
+            let fileMeta3Expected: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/var#b.d.e#/var#g#",
+                destinationAbsolutePath: "root/var#b.d.e#/var#g#",
+                relativePath: "root/var#b.d.e#/var#g#",
+            }
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3Expected,
+                content: FileContent.String("line1\nvar~b.c} are red\nvar{b.c# are blue"),
+                parse: false,
+            });
+
+            let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafeMultiSyntax, testSubjects);
             actual.should.deep.equal(expected)
@@ -401,11 +616,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path1,
                 relativePath: path1,
             }
-            let file1: FileSystemInstance = {
+            let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
                 content: FileContent.String("line1\nvar~b.c~ are red\nvar~b.c~ are blue"),
                 parse: true,
-            };
+            });
 
             let path2: string = "root/var~b.c~/var~g~";
             let fileMeta2: IFileSystemInstanceMetadata = {
@@ -413,11 +628,11 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path2,
                 relativePath: path2,
             }
-            let file2: FileSystemInstance = {
+            let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
                 content: FileContent.String("line2\nvar~b.d.e~ help me!\nvar~b.c~ are blue\nvar~g~ are black!!"),
                 parse: true,
-            };
+            });
 
             let path3: string = "root/var~b.d.e~/var~g~";
             let fileMeta3: IFileSystemInstanceMetadata = {
@@ -425,38 +640,227 @@ describe("VariableResolver", () => {
                 destinationAbsolutePath: path3,
                 relativePath: path3,
             }
-            let file3: FileSystemInstance = {
+            let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
                 content: FileContent.String("line2\nvar~b.d.f~ are red\nvar~b.c~ are blue\nvar~g~ are black!!"),
                 parse: true,
-            };
+            });
 
 			let testSubjects = [file1, file2, file3];
 
-            let file1Expected: FileSystemInstance = {
+            let file1Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
                 content: FileContent.String("line1\nViolets are red\nViolets are blue"),
                 parse: true,
-            };
+            });
 
-            let file2Expected: FileSystemInstance = {
+            let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
                 content: FileContent.String("line2\nplease help me!\nViolets are blue\nOreos are black!!"),
                 parse: true,
-            };
+            });
 
-            let file3Expected: FileSystemInstance = {
+            let file3Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
                 content: FileContent.String("line2\nApples are red\nViolets are blue\nOreos are black!!"),
                 parse: true,
-            };
+            });
 
-			let expected = [file1Expected, file2Expected, file3Expected];
+            let expected = [file1Expected, file2Expected, file3Expected];
 
-			let actual = variableResolver.ResolveContents(testCyanSafe, testSubjects);
-			actual.should.deep.equal(expected)
-		});
-	});
+            let actual = variableResolver.ResolveContents(testCyanSafe, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+
+        it("should replace the content variable with muilti syntax correctly", () => {
+            let path1: string = "root/var~a~/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~b.c~ are red\nvar{b.c} are blue"),
+                parse: true,
+            });
+
+            let path2: string = "root/var{b.c}/var#g#";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nvar#b.d.e# help me!\nvar{b.c} are blue\nvar~g~ are black!!"),
+                parse: true,
+            });
+
+            let path3: string = "root/var~b.d.e~/var{g}";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nvar{b.d.f} are red\nvar#b.c# are blue\nvar#g# are black!!"),
+                parse: true,
+            });
+
+            let testSubjects = [file1, file2, file3];
+
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nViolets are red\nViolets are blue"),
+                parse: true,
+            });
+
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nplease help me!\nViolets are blue\nOreos are black!!"),
+                parse: true,
+            });
+
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nApples are red\nViolets are blue\nOreos are black!!"),
+                parse: true,
+            });
+
+            let expected = [file1Expected, file2Expected, file3Expected];
+
+            let actual = variableResolver.ResolveContents(testCyanSafeMultiSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+
+        it("should replace the content variable with multi character syntax correctly", () => {
+            let path1: string = "root/var~~a}}/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar`{b.c}` are red\nvar##b.c} are blue"),
+                parse: true,
+            });
+
+            let path2: string = "root/var{{b.c#/var{~g~}";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nvar{{b.d.e# help me!\nvar{~b.c~} are blue\nvar${g}$ are black!!"),
+                parse: true,
+            });
+
+            let path3: string = "root/var~b.d.e~/var~g~";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nvar~~b.d.f}} are red\nvar##b.c} are blue\nvar{{g# are black!!"),
+                parse: true,
+            });
+
+            let testSubjects = [file1, file2, file3];
+
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nViolets are red\nViolets are blue"),
+                parse: true,
+            });
+
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nplease help me!\nViolets are blue\nOreos are black!!"),
+                parse: true,
+            });
+
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nApples are red\nViolets are blue\nOreos are black!!"),
+                parse: true,
+            });
+
+            let expected = [file1Expected, file2Expected, file3Expected];
+
+            let actual = variableResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+
+        it("should not replace content variables for files that should not be parsed", () => {
+            let path1: string = "root/var~~a}}/a.a";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~~b.c}} are red\nvar##b.c} are blue"),
+                parse: true,
+            });
+
+            let path2: string = "root/var{{b.c#/var{~g~}";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nvar{{b.d.e# help me!\nvar{~b.c~} are blue\nvar${g}$ are black!!"),
+                parse: false,
+            });
+
+            let path3: string = "root/var~b.d.e~/var~g~";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nvar~~b.d.f}} are red\nvar##b.c} are blue\nvar{{g# are black!!"),
+                parse: false,
+            });
+
+            let testSubjects = [file1, file2, file3];
+
+            let file1Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nViolets are red\nViolets are blue"),
+                parse: true,
+            });
+
+            let file2Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nvar{{b.d.e# help me!\nvar{~b.c~} are blue\nvar${g}$ are black!!"),
+                parse: false,
+            });
+
+            let file3Expected = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nvar~~b.d.f}} are red\nvar##b.c} are blue\nvar{{g# are black!!"),
+                parse: false,
+            });
+
+            let expected = [file1Expected, file2Expected, file3Expected];
+
+            let actual = variableResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
+            actual.should.deep.equal(expected)
+        });
+    });
 
     describe("ModifyVariablesWithAllSyntax", () => {
         it("should pad variables with all open and close syntax terms", () => {
