@@ -1,9 +1,8 @@
 import {
     CyanSafe,
+    DirectorySystemInstance,
     FileContent,
     FileSystemInstance,
-    FolderSystemInstance,
-    IFileSystemInstanceMetadata,
     IParsingStrategy,
     Syntax,
     VirtualFileSystemInstance
@@ -37,7 +36,7 @@ class VariableResolver implements IParsingStrategy {
                             }
                             return tempCount;
                         },
-                        Folder: (folder: FolderSystemInstance) => {
+                        Folder: (folder: DirectorySystemInstance) => {
                             return folder.parse ? folder.metadata.destinationAbsolutePath.Count(key) : 0
                         },
                         default: () => 0,
@@ -55,14 +54,30 @@ class VariableResolver implements IParsingStrategy {
         return result;
     }
 
-    ResolveFiles(cyan: CyanSafe, files: IFileSystemInstanceMetadata[]): IFileSystemInstanceMetadata[] {
+    ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
         const variables: Map<string, string> = this.util.FlattenObject(cyan.variable);
 
-        return files.Each((file: IFileSystemInstanceMetadata) => {
+        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             variables
                 .MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax))
                 .Each((allSyntaxes: string[], val: string) => {
-                    allSyntaxes.Map((syntax: string) => file.destinationAbsolutePath = file.destinationAbsolutePath.ReplaceAll(syntax, val));
+                    allSyntaxes.Map((syntax: string) => {
+                        VirtualFileSystemInstance.match(virtualFile, {
+                            File: (file: FileSystemInstance) => {
+                                file.metadata.destinationAbsolutePath =
+                                    file.parse
+                                        ? file.metadata.destinationAbsolutePath.ReplaceAll(syntax, val)
+                                        : file.metadata.destinationAbsolutePath;
+
+                            },
+                            Folder: (folder: DirectorySystemInstance) => {
+                                folder.metadata.destinationAbsolutePath =
+                                    folder.parse
+                                        ? folder.metadata.destinationAbsolutePath.ReplaceAll(syntax, val)
+                                        : folder.metadata.destinationAbsolutePath;
+                            }
+                        });
+                    });
                 });
         });
     }
