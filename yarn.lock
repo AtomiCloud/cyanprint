@@ -93,10 +93,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@kirinnee/core@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@kirinnee/core/-/core-0.7.5.tgz#3f44e200c3487c188f8274a79ddb3c4ecdc70194"
-  integrity sha512-9YXVShQmvSxsKIHnwL0CsW/dve92nZw2gTLaCpZTBgW4bqvuZeDMf3V+XXWYmZfUZmH+29oLyYPTuXliV4HnWQ==
+"@kirinnee/core@^0.7.7":
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/@kirinnee/core/-/core-0.7.7.tgz#5874fe584522fa20b671bc6c5d9cea0b5a777d63"
+  integrity sha512-qg+pRvjc4ojIOZuCcgFy+IfCP4kbemWZz0pBwp9mXWUiVAkQJ1HEIJxoBNWMdsP55v/2nAzhXaPwxMJ9GUfL5A==
 
 "@types/anymatch@*":
   version "1.3.1"
