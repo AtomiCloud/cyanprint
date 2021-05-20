@@ -82,22 +82,28 @@ class VariableResolver implements IParsingStrategy {
         });
     }
 
-    ResolveContents(cyan: CyanSafe, files: FileSystemInstance[]): FileSystemInstance[] {
+    ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
         const variablesMap: Map<string, string> = this.util.FlattenObject(cyan.variable);
         const allPossibleVariablesMap: Map<string[], string> = variablesMap.MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax));
 
-        return files.Each((file: FileSystemInstance) => {
-            if (!file.parse) return;
-            if (file["content"] == null) return;
-
-            FileContent.if.String(file.content, (str: string) => {
-                allPossibleVariablesMap
-                    .Each((allSyntaxes: string[], val: string) => {
-                        allSyntaxes.Map((syntax: string) => {
-                            str = str.ReplaceAll(syntax, val);
-                        });
+        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
+            VirtualFileSystemInstance.match(virtualFile, {
+                File: (file: FileSystemInstance) => {
+                    if (!file.parse) return;
+                    if (file["content"] == null) return;
+                    FileContent.if.String(file.content, (str: string) => {
+                        allPossibleVariablesMap
+                            .Each((allSyntaxes: string[], val: string) => {
+                                allSyntaxes.Map((syntax: string) => {
+                                    str = str.ReplaceAll(syntax, val);
+                                });
+                            });
+                        file.content = FileContent.String(str);
                     });
-                file.content = FileContent.String(str);
+                },
+                default: () => {
+                    return;
+                }
             });
         });
     }
