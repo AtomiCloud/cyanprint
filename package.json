@@ -29,7 +29,7 @@
     "start": "node dist/cyan"
   },
   "dependencies": {
-    "@kirinnee/core": "^0.7.7",
+    "@kirinnee/core": "^0.7.8",
     "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "commander": "^7.0.0",
