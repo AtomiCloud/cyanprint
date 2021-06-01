@@ -27,9 +27,8 @@ class VariableResolver implements IParsingStrategy {
                 allPossibleVariables.Each((key: string) => {
                     const count = VirtualFileSystemInstance.match(virtualFile, {
                         File: (file: FileSystemInstance) => {
-                            if (!file.parse) return 0;
-                            let tempCount = file.metadata.destinationAbsolutePath.Count(key);
-                            if (file["content"] != null) {
+                            let tempCount = file.parseMetadata ? file.metadata.destinationAbsolutePath.Count(key) : 0;
+                            if (file["content"] != null && file.parseContent) {
                                 FileContent.if.String(file.content, (str) => {
                                     tempCount += str.Count(key);
                                 });
@@ -37,7 +36,7 @@ class VariableResolver implements IParsingStrategy {
                             return tempCount;
                         },
                         Folder: (folder: DirectorySystemInstance) => {
-                            return folder.parse ? folder.metadata.destinationAbsolutePath.Count(key) : 0
+                            return folder.parseMetadata ? folder.metadata.destinationAbsolutePath.Count(key) : 0
                         },
                         default: () => 0,
                     });
@@ -65,14 +64,14 @@ class VariableResolver implements IParsingStrategy {
                         VirtualFileSystemInstance.match(virtualFile, {
                             File: (file: FileSystemInstance) => {
                                 file.metadata.destinationAbsolutePath =
-                                    file.parse
+                                    file.parseMetadata
                                         ? file.metadata.destinationAbsolutePath.ReplaceAll(syntax, val)
                                         : file.metadata.destinationAbsolutePath;
 
                             },
                             Folder: (folder: DirectorySystemInstance) => {
                                 folder.metadata.destinationAbsolutePath =
-                                    folder.parse
+                                    folder.parseMetadata
                                         ? folder.metadata.destinationAbsolutePath.ReplaceAll(syntax, val)
                                         : folder.metadata.destinationAbsolutePath;
                             }
@@ -89,7 +88,7 @@ class VariableResolver implements IParsingStrategy {
         return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.parse) return;
+                    if (!file.parseContent) return;
                     if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
                         allPossibleVariablesMap

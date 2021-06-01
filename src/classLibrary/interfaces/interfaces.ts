@@ -47,12 +47,13 @@ type FileContent = typeof FileContent.T;
 interface FileSystemInstance {
 	metadata: IFileSystemInstanceMetadata;
 	content: FileContent;
-	parse: boolean;
+	parseContent: boolean;
+	parseMetadata: boolean;
 }
 
 interface DirectorySystemInstance {
 	metadata: IFileSystemInstanceMetadata;
-	parse: boolean;
+	parseMetadata: boolean;
 }
 
 const VirtualFileSystemInstance = Union({
