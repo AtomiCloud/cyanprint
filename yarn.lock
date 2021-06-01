@@ -93,10 +93,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@kirinnee/core@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@kirinnee/core/-/core-0.7.5.tgz#3f44e200c3487c188f8274a79ddb3c4ecdc70194"
-  integrity sha512-9YXVShQmvSxsKIHnwL0CsW/dve92nZw2gTLaCpZTBgW4bqvuZeDMf3V+XXWYmZfUZmH+29oLyYPTuXliV4HnWQ==
+"@kirinnee/core@^0.7.8":
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@kirinnee/core/-/core-0.7.8.tgz#986e39ca69913ad06cd52c5106182485a4fa4eb8"
+  integrity sha512-KMwiSNZqtySuLW0BIHfpX6X1iDBqYZhoehBXLS8mrjFK5vw4RolHAKCLVrCs/ZjBL8To9CJrSjzOdLdCp7UmHw==
 
 "@types/anymatch@*":
   version "1.3.1"
@@ -130,6 +130,11 @@
   dependencies:
     "@types/rx" "*"
     "@types/through" "*"
+
+"@types/lodash@^4.14.170":
+  version "4.14.170"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.170.tgz#0d67711d4bf7f4ca5147e9091b847479b87925d6"
+  integrity sha512-bpcvu/MKHHeYX+qeEN8GE7DIravODWdACVA1ctevD8CN24RhPZIKMn9ntfAsrvLfSX3cR5RrBKAbYm9bGs0A+Q==
 
 "@types/minimatch@*":
   version "3.0.3"
@@ -2259,6 +2264,11 @@ lodash@^4.17.19:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 lru-cache@^4.0.1:
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.5.tgz#8bbe50ea85bed59bc9e33dcab8235ee9bcf443cd"
@@ -3653,6 +3663,11 @@ ts-node@^7.0.1:
     mkdirp "^0.5.1"
     source-map-support "^0.5.6"
     yn "^2.0.0"
+
+ts-union@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/ts-union/-/ts-union-2.3.0.tgz#2dc5240e0a1ceea2159bf06cacdc96a78475dd04"
+  integrity sha512-OP+W9WoYvGlOMjc90D6nYz60jU1zQlXAg3VBtuSoMDejY94PaORkya9HtHjaaqqwA4I5/hN38fmKK0nSWj7jPg==
 
 tslib@^1.9.0:
   version "1.14.1"
