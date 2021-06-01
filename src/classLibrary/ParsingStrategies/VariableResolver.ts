@@ -25,21 +25,7 @@ class VariableResolver implements IParsingStrategy {
             variables.Each((variable: string) => {
                 const allPossibleVariables = this.ModifyVariablesWithAllSyntax(variable, syntaxes);
                 allPossibleVariables.Each((key: string) => {
-                    const count = VirtualFileSystemInstance.match(virtualFile, {
-                        File: (file: FileSystemInstance) => {
-                            let tempCount = file.parseMetadata ? file.metadata.destinationAbsolutePath.Count(key) : 0;
-                            if (file["content"] != null && file.parseContent) {
-                                FileContent.if.String(file.content, (str) => {
-                                    tempCount += str.Count(key);
-                                });
-                            }
-                            return tempCount;
-                        },
-                        Folder: (folder: DirectorySystemInstance) => {
-                            return folder.parseMetadata ? folder.metadata.destinationAbsolutePath.Count(key) : 0
-                        },
-                        default: () => 0,
-                    });
+                    const count = this.CountKeyInVFS(key, virtualFile);
 
                     if (result.has(variable)) {
                         result.set(variable, result.get(variable)! + count);
@@ -51,6 +37,24 @@ class VariableResolver implements IParsingStrategy {
         });
 
         return result;
+    }
+
+    private CountKeyInVFS(key: string, virtualFile: VirtualFileSystemInstance): number {
+        return VirtualFileSystemInstance.match(virtualFile, {
+            File: (file: FileSystemInstance) => {
+                let tempCount = file.parseMetadata ? file.metadata.destinationAbsolutePath.Count(key) : 0;
+                if (file["content"] != null && file.parseContent) {
+                    FileContent.if.String(file.content, (str) => {
+                        tempCount += str.Count(key);
+                    });
+                }
+                return tempCount;
+            },
+            Folder: (folder: DirectorySystemInstance) => {
+                return folder.parseMetadata ? folder.metadata.destinationAbsolutePath.Count(key) : 0
+            },
+            default: () => 0,
+        });
     }
 
     ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
