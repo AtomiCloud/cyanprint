@@ -65,9 +65,8 @@ type VirtualFileSystemInstance = typeof VirtualFileSystemInstance.T;
 interface Glob {
 	root: string;
 	pattern: string[] | string;
-	ignore: Partial<Ignore>;
-	// { variableResolver: { path: true, content: true }, flagResolve: {path: true, content: true } .... }
-	// object of objects
+	skip: Partial<Ignore>;
+	ignore: string[] | string;
 }
 
 interface IgnoreConfig {
