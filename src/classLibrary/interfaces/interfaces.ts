@@ -47,13 +47,12 @@ type FileContent = typeof FileContent.T;
 interface FileSystemInstance {
 	metadata: IFileSystemInstanceMetadata;
 	content: FileContent;
-	parseContent: boolean;
-	parseMetadata: boolean;
+	ignore: Ignore;
 }
 
 interface DirectorySystemInstance {
 	metadata: IFileSystemInstanceMetadata;
-	parseMetadata: boolean;
+	ignore: Ignore;
 }
 
 const VirtualFileSystemInstance = Union({
@@ -66,7 +65,22 @@ type VirtualFileSystemInstance = typeof VirtualFileSystemInstance.T;
 interface Glob {
 	root: string;
 	pattern: string[] | string;
-	ignore: string | string[];
+	ignore: Partial<Ignore>;
+	// { variableResolver: { path: true, content: true }, flagResolve: {path: true, content: true } .... }
+	// object of objects
+}
+
+interface IgnoreConfig {
+	metadata: boolean;
+	content: boolean;
+}
+
+interface Ignore {
+	variableResolver: Partial<IgnoreConfig>;
+	inlineResolver: Partial<IgnoreConfig>;
+	ifElseResolver: Partial<IgnoreConfig>;
+	guidResolver: Partial<IgnoreConfig>;
+	custom: object; // Reserved for custom parsing strategies from plugins
 }
 
 // TODO may need further review
@@ -106,5 +120,6 @@ export {
 	IParsingStrategy,
 	FileContent,
 	DirectorySystemInstance,
-	VirtualFileSystemInstance
+	VirtualFileSystemInstance,
+	Ignore
 };
