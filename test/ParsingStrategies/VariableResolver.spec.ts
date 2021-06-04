@@ -9,7 +9,7 @@ import {
 import { Core, Kore, SortType } from "@kirinnee/core";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { VariableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
-import * as _ from "lodash";
+import _ from "lodash";
 
 should();
 let core: Core = new Kore();
