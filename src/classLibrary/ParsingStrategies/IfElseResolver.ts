@@ -22,10 +22,10 @@ class IfElseResolver implements IParsingStrategy {
 
         virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             flags.Each((flag: string) => {
-                const allPossibleIf = this.ModifyIfWithAllSyntax(flag, syntaxes);
-                allPossibleIf.Each((key: string) => {
+                const allPossibleIfs = this.ModifyIfWithAllSyntax(flag, syntaxes).concat(this.ModifyInverseIfWithAllSyntax(flag, syntaxes));
+                allPossibleIfs.Each((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile)
-									.AtMax(this.CountKeyInVFS(this.ConvertIfToEndKey(key), virtualFile));
+									.AtMax(this.CountKeyInVFS(this.ConvertIfToEndKeyword(key), virtualFile));
                     if (result.has(flag)) {
                         result.set(flag, result.get(flag)! + count);
                     } else {
@@ -69,7 +69,7 @@ class IfElseResolver implements IParsingStrategy {
 		return allPossibleInverseIfs;
 	}
 
-	ConvertIfToEndKey(ifStatement: string): string
+	ConvertIfToEndKeyword(ifStatement: string): string
 	{
 		return ifStatement.replace('if', 'end');
 	}
@@ -82,7 +82,7 @@ class IfElseResolver implements IParsingStrategy {
 	ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
         const allPossibleIfSyntaxesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
-
+		const allPossibleInverseIfSyntaxesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseIfWithAllSyntax(key, cyan.syntax));
         return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
@@ -92,17 +92,9 @@ class IfElseResolver implements IParsingStrategy {
                     FileContent.if.String(file.content, (strContent: string) => {
                         allPossibleIfSyntaxesMap.Each((ifSyntaxes: string[], v: boolean) => {
 							ifSyntaxes.Each((ifSyntax: string) => {
-								let startIndex: number[] = strContent
-								.LineBreak()
-								.Map((s: string, i: number) => [s, i] as [string, number])
-								.Where((n: [string, number]) => n[0].includes(ifSyntax))
-								.Map((n: [string, number]) => n[1]);
-								
-								let endIndex: number[] = strContent
-									.LineBreak()
-									.Map((s: string, i: number) => [s, i] as [string, number])
-									.Where((n: [string, number]) => n[0].includes(this.ConvertIfToEndKey(ifSyntax)))
-									.Map(((n: [string, number]) => n[1]));
+								let startIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSyntax);
+								let endIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
+									this.ConvertIfToEndKeyword(ifSyntax));
 								if (v) {
 									strContent = strContent.LineBreak().WithoutIndex(startIndex.concat(endIndex)).join('\n');
 								} else {
@@ -114,8 +106,26 @@ class IfElseResolver implements IParsingStrategy {
 										).join('\n');
 								}	
 							})
-						file.content = FileContent.String(strContent);
 						});
+						allPossibleInverseIfSyntaxesMap.Each((invIfSyntaxes: string[], v: boolean) => {
+							invIfSyntaxes.Each((invIfSyntax: string) => {
+								let startIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSyntax);
+								let endIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
+									this.ConvertIfToEndKeyword(invIfSyntax));
+								
+								if (!v) {
+									strContent = strContent.LineBreak().WithoutIndex(startIndex.concat(endIndex)).join('\n');
+								} else {
+									strContent =
+										strContent.LineBreak().WithoutIndex(
+											startIndex.Map((n: number, index: number) =>
+												[].Fill(endIndex[index] - n + 1, (i: number) => i + n)
+											).Flatten()
+										).join('\n');
+								}	
+							})
+						});
+						file.content = FileContent.String(strContent);
                     });
                 },
                 default: () => {
@@ -125,6 +135,15 @@ class IfElseResolver implements IParsingStrategy {
         });
 		
 	};
+
+	RetrieveLineIndexContainingSyntax(strContent: string, syntax: string): number[] {
+		let index: number[] = strContent
+								.LineBreak()
+								.Map((s: string, i: number) => [s, i] as [string, number])
+								.Where((n: [string, number]) => n[0].includes(syntax))
+								.Map((n: [string, number]) => n[1]);
+		return index;
+	}
 	
 }
 
