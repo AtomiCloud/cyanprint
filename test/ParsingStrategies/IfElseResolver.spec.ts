@@ -164,6 +164,118 @@ describe("IfElseResolver", () => {
             actual.should.deep.equal(expected);
         });
 
+        it("should count the number of occurrences of each inverse ifend correctly", () => {
+            let path1: string = "root/file1/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nthe color is:\nif!~a~\nred\nend!~a~\nif!~b.c~\nblue\nend!~b.c~"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/file2";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!~b.d.e~\n help me!\nend!~b.d.e~\nif!~b.c~\n are blue\nend!~b.c~\nif!~g~\n are black!!\nend!~g~"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/file3";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif!~b.d.f~\n are red\nend!~b.d.f~\nif!~b.c~\n are blue\nend!~b.c~\nif!~g~\n are black!!\nend!~g~"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafe, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of a each ifend and inverse ifend correctly", () => {
+            let path1: string = "root/file1/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nthe color is:\nif!~a~\nred\nend!~a~\nif~b.c~\nblue\nend~b.c~"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/file2";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!~b.d.e~\n help me!\nend!~b.d.e~\nif~b.c~\n are blue\nend~b.c~\nif~g~\n are black!!\nend~g~"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/file3";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif~b.d.f~\n are red\nend~b.d.f~\nif~b.c~\n are blue\nend~b.c~\nif!~g~\n are black!!\nend!~g~"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafe, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
         it("should count the number of occurrences of each ifend for all different syntaxes", () => {
             let path1: string = "root/whatever/if~a~/end~a~";
             let fileMeta1: IFileSystemInstanceMetadata = {
@@ -198,6 +310,114 @@ describe("IfElseResolver", () => {
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
                 content: FileContent.String("line2\nif#b.d.f#\n are red\nend#b.d.f#\nif#b.c# are blue\nend#b.c#\nif#g#\n are black!!\nend#g#"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafeMultiSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each inverse ifend for all different syntaxes", () => {
+            let path1: string = "root/whatever/if!~a~/end!~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nif!~a~\n are red\nend!~a~\nif!~b.c~ are blue\nend!~b.c~"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/something";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!~b.d.e~\n help me!\nend!~b.d.e~\nif!#b.c# \nare blue\nend!#b.c#\nif!{g}\n are black!!\nend!{g}"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif!#b.d.f#\n are red\nend!#b.d.f#\nif!#b.c# are blue\nend!#b.c#\nif!#g#\n are black!!\nend!#g#"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafeMultiSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each ifend and inverse ifend for all different syntaxes", () => {
+            let path1: string = "root/whatever/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nif~a~\n are red\nend~a~\nif!~b.c~ are blue\nend!~b.c~"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/something";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif~b.d.e~\n help me!\nend~b.d.e~\nif!#b.c# \nare blue\nend!#b.c#\nif{g}\n are black!!\nend{g}"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif!#b.d.f#\n are red\nend!#b.d.f#\nif#b.c# are blue\nend#b.c#\nif!#g#\n are black!!\nend!#g#"),
                 ignore: parseAll,
             });
 
@@ -272,7 +492,115 @@ describe("IfElseResolver", () => {
             actual.should.deep.equal(expected);
         });
 
-        it("should not count flags for files marked to be not parsed & for ignore which parses metadata, the path should just be the same", () => {
+        it("should count the number of occurrences of each inverse ifend for multi character syntaxes", () => {
+            let path1: string = "root/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nif!~~a}}\n are red\nend!~~a}}\nif!{{b.c#\n are blue\nend!{{b.c#"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nend!##b.d.e}\nif!{{b.c#\n are blue\nend!{{b.c#\nif!${g}$\n are black!!\nend!${g}$"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif!`{b.d.f}`n are red\nend!`{b.d.f}`\nif!{{b.c#\n are blue\nend!{{b.c#\nif!{~g~}\n are black!!\nend!{~g~}"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each ifend and inverse ifend for multi character syntaxes", () => {
+            let path1: string = "root/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nif~~a}}\n are red\nend~~a}}\nif!{{b.c#\n are blue\nend!{{b.c#"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nend!##b.d.e}\nif{{b.c#\n are blue\nend{{b.c#\nif!${g}$\n are black!!\nend!${g}$"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif`{b.d.f}`n are red\nend`{b.d.f}`\nif!{{b.c#\n are blue\nend!{{b.c#\nif{~g~}\n are black!!\nend{~g~}"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 1],
+                ["b.c", 3],
+                ["b.d.e", 1],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = ifElseResolver.Count(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should not count flags for files marked to be not parsed, ignoring the file metadata", () => {
             let path1: string = "root/if~~a}}/a.a/end~~a}}";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
@@ -281,7 +609,7 @@ describe("IfElseResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nif~~a}}\n are red\nend~~a}}\nif{{b.c#\n are blue\nend{{b.c#"),
+                content: FileContent.String("line1\nif~~a}}\n are red\nend~~a}}\nif!{{b.c#\n are blue\nend!{{b.c#"),
                 ignore: parseMetadata,
             });
 
@@ -293,7 +621,7 @@ describe("IfElseResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nif##b.d.e}\n help me!\nend##b.d.e}\nif{{b.c#\n are blue\nend{{b.c#\nif${g}$\n are black!!\nend${g}$"),
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nend!##b.d.e}\nif{{b.c#\n are blue\nend{{b.c#\nif${g}$\n are black!!\nend${g}$"),
                 ignore: parseAll,
             });
 
@@ -305,7 +633,7 @@ describe("IfElseResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif~~b.d.f}}\n are red\nend~~b.d.f}}\nif{{b.c#\n are blue\nend{{b.c#\nif{~g~}\n are black!!\nend{~g~}"),
+                content: FileContent.String("line2\nif~~b.d.f}}\n are red\nend~~b.d.f}}\nif{{b.c#\n are blue\nend{{b.c#\nif!{~g~}\n are black!!\nend!{~g~}"),
                 ignore: parseContent,
             });
 
@@ -317,7 +645,7 @@ describe("IfElseResolver", () => {
             }
             let file4 = VirtualFileSystemInstance.File({
                 metadata: fileMeta4,
-                content: FileContent.String("line2\nif~b.d.f}\n are red\nend~b.d.f}\nif{b.c#\n are blue\nend{b.c#\nif{~g~}\n are black!!\nend{~g~}"),
+                content: FileContent.String("line2\nif!~b.d.f}\n are red\nend!~b.d.f}\nif{b.c#\n are blue\nend{b.c#\nif{~g~}\n are black!!\nend{~g~}"),
                 ignore: parseNothing,
             });
 
@@ -363,7 +691,7 @@ describe("IfElseResolver", () => {
 
     describe("ResolveFiles", () => {
         it("should return the file destination exactly", () => {
-            let path1: string = "root/if~a~/a.a";
+            let path1: string = "root/if~a~/a.a/end~a~";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
                 destinationAbsolutePath: path1,
@@ -375,7 +703,7 @@ describe("IfElseResolver", () => {
                 ignore: parseAll,
             });
 
-            let path2: string = "root/if~b.c~/if~g~";
+            let path2: string = "root/if~b.c~/end~b.c~/if~g~/file/end~g~";
             let fileMeta2: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path2,
                 destinationAbsolutePath: path2,
@@ -402,9 +730,9 @@ describe("IfElseResolver", () => {
             let testSubjects = [file1, file2, file3];
             
             let fileMeta1Expected: IFileSystemInstanceMetadata = {
-                sourceAbsolutePath: "root/if~a~/a.a",
-                destinationAbsolutePath: "root/if~a~/a.a",
-                relativePath: "root/if~a~/a.a",
+                sourceAbsolutePath: "root/if~a~/a.a/end~a~",
+                destinationAbsolutePath: "root/if~a~/a.a/end~a~",
+                relativePath: "root/if~a~/a.a/end~a~",
             }
             let file1Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta1Expected,
@@ -413,9 +741,9 @@ describe("IfElseResolver", () => {
             });
 
             let fileMeta2Expected: IFileSystemInstanceMetadata = {
-                sourceAbsolutePath: "root/if~b.c~/if~g~",
-                destinationAbsolutePath: "root/if~b.c~/if~g~",
-                relativePath: "root/if~b.c~/if~g~",
+                sourceAbsolutePath: "root/if~b.c~/end~b.c~/if~g~/file/end~g~",
+                destinationAbsolutePath: "root/if~b.c~/end~b.c~/if~g~/file/end~g~",
+                relativePath: "root/if~b.c~/end~b.c~/if~g~/file/end~g~",
             }
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2Expected,
@@ -443,7 +771,7 @@ describe("IfElseResolver", () => {
 
     describe("ResolveContents", () => {
     
-		it("should replace the content within ifelse to the correct value", () => {
+		it("should replace the content within ifend and inverse ifend to the correct value", () => {
 			let path1: string = "root/";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
@@ -452,7 +780,7 @@ describe("IfElseResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nif~b.c~\nRoses are red\nend~b.c~\nif~b.c~\nViolets are blue\nend~b.c~"),
+                content: FileContent.String("line1\nif~b.c~\nRoses are red\nend~b.c~\nif!~b.c~\nViolets are blue\nend!~b.c~"),
                 ignore: parseAll,
             });
 
@@ -476,7 +804,7 @@ describe("IfElseResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif~b.d.f~\nRoses are red\nend~b.d.f~\nif~b.c~\nViolets are blue\nend~b.c~\nif~g~\nOreos are black!!\nend~g~"),
+                content: FileContent.String("line2\nif!~b.d.f~\nRoses are red\nend!~b.d.f~\nif~b.c~\nViolets are blue\nend~b.c~\nif!~g~\nOreos are black!!\nend!~g~"),
                 ignore: parseAll,
             });
 
@@ -484,7 +812,7 @@ describe("IfElseResolver", () => {
 
             let file1Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nRoses are red\nViolets are blue"),
+                content: FileContent.String("line1\nRoses are red"),
                 ignore: parseAll,
             });
 
@@ -496,7 +824,7 @@ describe("IfElseResolver", () => {
 
             let file3Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nRoses are red\nViolets are blue"),
                 ignore: parseAll,
             });
 
@@ -506,8 +834,7 @@ describe("IfElseResolver", () => {
             actual.should.deep.equal(expected)
         });
        
-        //error
-        it("should replace the content within ifelse with multi syntax correctly", () => {
+        it("should replace the content within ifend and inverse ifend with multi syntax correctly", () => {
             let path1: string = "root/";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
@@ -516,7 +843,7 @@ describe("IfElseResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nif~b.c~\nRoses are red\nend~b.c~\nif{b.c}\nViolets are blue\nend{b.c}"),
+                content: FileContent.String("line1\nif~b.c~\nRoses are red\nend~b.c~\nif!{b.c}\nViolets are blue\nend!{b.c}"),
                 ignore: parseAll,
             });
 
@@ -528,7 +855,7 @@ describe("IfElseResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nif#b.d.e#\nhelp me!\nend#b.d.e#\nif{b.c}\nViolets are blue\nend{b.c}\nif~g~\nOreos are black!!\nend~g~"),
+                content: FileContent.String("line2\nif!#b.d.e#\nHelp me!\nend!#b.d.e#\nif{b.c}\nViolets are blue\nend{b.c}\nif~g~\nOreos are black!!\nend~g~"),
                 ignore: parseAll,
             });
 
@@ -540,7 +867,7 @@ describe("IfElseResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif{b.d.f}\nRoses are red\nend{b.d.f}\nif#b.c#\nViolets are blue\nend#b.c#\nif#g#\nOreos are black!!\nend#g#"),
+                content: FileContent.String("line2\nif{b.d.f}\nRoses are red\nend{b.d.f}\nif!#b.c#\nViolets are blue\nend!#b.c#\nif#g#\nOreos are black!!\nend#g#"),
                 ignore: parseAll,
             });
 
@@ -548,19 +875,19 @@ describe("IfElseResolver", () => {
 
             let file1Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nRoses are red\nViolets are blue"),
+                content: FileContent.String("line1\nRoses are red"),
                 ignore: parseAll,
             });
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nHelp me!\nViolets are blue\nOreos are black!!"),
                 ignore: parseAll,
             });
 
             let file3Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nOreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -571,7 +898,7 @@ describe("IfElseResolver", () => {
         });
 
          
-        it("should replace the content within ifend with multi character syntax correctly", () => {
+        it("should replace the content within ifend and inverse ifend with multi character syntax correctly", () => {
             let path1: string = "root/var";
             let fileMeta1: IFileSystemInstanceMetadata = {
                 sourceAbsolutePath: path1,
@@ -580,7 +907,7 @@ describe("IfElseResolver", () => {
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nif`{b.c}`\nRoses are red\nend`{b.c}`\nif##b.c}\nViolets are blue\nend##b.c}"),
+                content: FileContent.String("line1\nif`{b.c}`\nRoses are red\nend`{b.c}`\nif!##b.c}\nViolets are blue\nend!##b.c}"),
                 ignore: parseAll,
             });
 
@@ -592,7 +919,7 @@ describe("IfElseResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nif{{b.d.e#\nhelp me!\nend{{b.d.e#\nif{~b.c~}\nViolets are blue\nend{~b.c~}\nif${g}$\nOreos are black!!\nend${g}$"),
+                content: FileContent.String("line2\nif{{b.d.e#\nhelp me!\nend{{b.d.e#\nif!{~b.c~}\nViolets are blue\nend!{~b.c~}\nif${g}$\nOreos are black!!\nend${g}$"),
                 ignore: parseAll,
             });
 
@@ -604,7 +931,7 @@ describe("IfElseResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif##b.c}\nViolets are blue\nend##b.c}\nif{{g#\nOreos are black!!\nend{{g#"),
+                content: FileContent.String("line2\nif!~~b.d.f}}\nRoses are red\nend!~~b.d.f}}\nif##b.c}\nViolets are blue\nend##b.c}\nif{{g#\nOreos are black!!\nend{{g#"),
                 ignore: parseAll,
             });
 
@@ -612,19 +939,19 @@ describe("IfElseResolver", () => {
 
             let file1Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nRoses are red\nViolets are blue"),
+                content: FileContent.String("line1\nRoses are red"),
                 ignore: parseAll,
             });
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nOreos are black!!"),
                 ignore: parseAll,
             });
 
             let file3Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nRoses are red\nViolets are blue\nOreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -655,7 +982,7 @@ describe("IfElseResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nif##b.d.e}\n help me!\nend##b.d.e}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif${g}$\nOreos are black!!\nend${g}$"),
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nend!##b.d.e}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif${g}$\nOreos are black!!\nend${g}$"),
                 ignore: parseMetadata,
             });
 
@@ -667,7 +994,7 @@ describe("IfElseResolver", () => {
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif{~g~}\nOreos are black!!\nend{~g~}"),
+                content: FileContent.String("line2\nif~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif{~g~}\nOreos are black!!\nend{~g~}"),
                 ignore: parseMetadata,
             });
 
@@ -703,13 +1030,13 @@ describe("IfElseResolver", () => {
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nif##b.d.e}\n help me!\nend##b.d.e}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif${g}$\nOreos are black!!\nend${g}$"),
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nend!##b.d.e}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif${g}$\nOreos are black!!\nend${g}$"),
                 ignore: parseMetadata,
             });
 
             let file3Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\nif~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif{{b.c#\nViolets are blue\nend{{b.c#\nif{~g~}\nOreos are black!!\nend{~g~}"),
+                content: FileContent.String("line2\nif~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif{~g~}\nOreos are black!!\nend{~g~}"),
                 ignore: parseMetadata,
             });
 
@@ -737,6 +1064,21 @@ describe("IfElseResolver", () => {
             ]);
         });
     });
+
+    describe("ModifyFlagsWithAllInverseIfSyntax", () => {
+        it("should pad flags with all if and its inverted syntax terms", () => {
+            ifElseResolver.ModifyInverseIfWithAllSyntax("hello", testCyanSafe.syntax).should.deep.equal([
+                "if!~hello~"
+            ]);
+        });
+    });
+
+    describe("RetrieveLineIndexContainingSyntax", () => {
+        it("should retrieve all the line numbers with the syntax", () => {
+            ifElseResolver.RetrieveLineIndexContainingSyntax("if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}", "if~~b.d.f}}").should.deep.equal([
+                0, 6
+            ])
+        });
+    });
 });
 
-//ModifyIfWithAllSyntax(v: string, syntaxes: Syntax[]): string[]
