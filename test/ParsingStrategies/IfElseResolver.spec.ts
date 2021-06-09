@@ -1080,5 +1080,23 @@ describe("IfElseResolver", () => {
             ])
         });
     });
+
+    describe("RemoveContentBetweenLineIndexes", () => {
+        it("should remove all content between lines", () => {
+            const strContent: string = "if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}";
+            const startIndexes: number[] = [0, 6];
+            const endIndexes: number[] = [2, 8]
+            ifElseResolver.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent).should.deep.equal("if!{{b.c#\nViolets are blue\nend!{{b.c#");
+        });
+    });
+
+    describe("RemoveLineIndexes", () => {
+        it("should remove all lines", () => {
+            const strContent: string = "if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}";
+            const indexes: number[] = [0, 6, 2, 8];
+            
+            ifElseResolver.RemoveLineIndexes(indexes, strContent).should.deep.equal("Roses are red\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nOreos are black!!");
+        });
+    });
 });
 

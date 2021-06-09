@@ -92,36 +92,26 @@ class IfElseResolver implements IParsingStrategy {
                     FileContent.if.String(file.content, (strContent: string) => {
                         allPossibleIfSyntaxesMap.Each((ifSyntaxes: string[], v: boolean) => {
 							ifSyntaxes.Each((ifSyntax: string) => {
-								let startIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSyntax);
-								let endIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
+								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSyntax);
+								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
 									this.ConvertIfToEndKeyword(ifSyntax));
 								if (v) {
-									strContent = strContent.LineBreak().WithoutIndex(startIndex.concat(endIndex)).join('\n');
+									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
 								} else {
-									strContent =
-										strContent.LineBreak().WithoutIndex(
-											startIndex.Map((n: number, index: number) =>
-												[].Fill(endIndex[index] - n + 1, (i: number) => i + n)
-											).Flatten()
-										).join('\n');
+									strContent = this.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent);
 								}	
 							})
 						});
 						allPossibleInverseIfSyntaxesMap.Each((invIfSyntaxes: string[], v: boolean) => {
 							invIfSyntaxes.Each((invIfSyntax: string) => {
-								let startIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSyntax);
-								let endIndex: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
+								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSyntax);
+								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
 									this.ConvertIfToEndKeyword(invIfSyntax));
 								
 								if (!v) {
-									strContent = strContent.LineBreak().WithoutIndex(startIndex.concat(endIndex)).join('\n');
+									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
 								} else {
-									strContent =
-										strContent.LineBreak().WithoutIndex(
-											startIndex.Map((n: number, index: number) =>
-												[].Fill(endIndex[index] - n + 1, (i: number) => i + n)
-											).Flatten()
-										).join('\n');
+									strContent = this.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent);
 								}	
 							})
 						});
@@ -143,6 +133,19 @@ class IfElseResolver implements IParsingStrategy {
 								.Where((n: [string, number]) => n[0].includes(syntax))
 								.Map((n: [string, number]) => n[1]);
 		return index;
+	}
+
+	RemoveContentBetweenLineIndexes(startIndexes: number[], endIndexes: number[], strContent: string): string {
+		if (startIndexes.length != endIndexes.length) return strContent;
+		return strContent.LineBreak().WithoutIndex(
+			startIndexes.Map((n: number, index: number) =>
+				[].Fill(endIndexes[index] - n + 1, (i: number) => i + n)
+			).Flatten()
+		).join('\n');
+	}
+
+	RemoveLineIndexes(lineIndexes: number[], strContent: string) : string {
+		return strContent.LineBreak().WithoutIndex(lineIndexes).join('\n');
 	}
 	
 }
