@@ -72,7 +72,6 @@ class InlineFlagResolver implements IParsingStrategy {
 		return allPossibleInverseInlineFlags;
 	}
 	
-    //have not settled for inverse
 	ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
 		const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((flag: string) => this.ModifyFlagWithAllSyntax(flag, cyan.syntax));
@@ -129,7 +128,7 @@ class InlineFlagResolver implements IParsingStrategy {
                     if (!file.ignore.inlineResolver.content) return;
                     if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
-                        str = this.ConstructContentWithCommentsRemoved(str, allPossibleFlagsMap, cyan.comments);
+                        str = this.ConstructContentForInlineFlags(str, allPossibleFlagsMap, cyan.comments);
                         file.content = FileContent.String(str);
                     });
                 },
@@ -140,19 +139,20 @@ class InlineFlagResolver implements IParsingStrategy {
         });
 	};
 
-    ConstructContentWithCommentsRemoved(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[]): string {
+    ConstructContentForInlineFlags(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[]): string {
         allPossibleSignatureMap
             .Each((allSignatures: string[], val: boolean) => {
                 content = content
                     .LineBreak()
                     .Where((s: string) => this.ShouldKeepStringWithInlineFlag(allSignatures, val, s))
-                    .Map((s: string) => s.Without(this.GenerateCommentAndSignatureStrings(allSignatures, comments)))
+                    .Map((s: string) => s.Without(this.GenerateCommentsWithSignatureStrings(allSignatures, comments))) //why should it care about comments?
+                    .Map((s: string) => s.Without(allSignatures))
                     .join("\n");
             });
         return content;
     }
 
-    GenerateCommentAndSignatureStrings(signatures: string[], comments: string[]): string[] {
+    GenerateCommentsWithSignatureStrings(signatures: string[], comments: string[]): string[] {
 		return comments
 			.Map((c: string) =>
 				signatures.Map((k: string) => c + k)
