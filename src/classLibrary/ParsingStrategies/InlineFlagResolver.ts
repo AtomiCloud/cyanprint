@@ -75,16 +75,22 @@ class InlineFlagResolver implements IParsingStrategy {
 	ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
 		const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((flag: string) => this.ModifyFlagWithAllSyntax(flag, cyan.syntax));
+        const allPossibleInverseFlagsMap: Map<string[], boolean> = flagsMap.MapKey((flag: string) => this.ModifyInverseFlagWithAllSyntax(flag, cyan.syntax));
+
 		return virtualFiles.Where((virtualFile: VirtualFileSystemInstance) => {
             let shouldStay: boolean = true;
             allPossibleFlagsMap
                 .forEach((flagVal: boolean, flagWithAllSyntaxes: string[]) => {
                     shouldStay = shouldStay && this.ShouldKeepFileWithInlineFlag(flagWithAllSyntaxes, flagVal, virtualFile);
                 })
+            allPossibleInverseFlagsMap
+                .forEach((flagVal: boolean, flagWithAllSyntaxes: string[]) => {
+                    shouldStay = shouldStay && this.ShouldKeepFileWithInlineFlag(flagWithAllSyntaxes, !flagVal, virtualFile);
+                })
             return shouldStay;
         }).Each((virtualFile: VirtualFileSystemInstance) => {
-            allPossibleFlagsMap
-                .forEach((val: boolean, key: string[]) => {
+            allPossibleFlagsMap.Keys().concat(allPossibleInverseFlagsMap.Keys())
+                .forEach((key: string[]) => {
                     this.RemoveFlagFromMetadataDestinationPath(key, virtualFile)
                 });    
         });
@@ -122,13 +128,16 @@ class InlineFlagResolver implements IParsingStrategy {
 	ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
         const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
         const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyFlagWithAllSyntax(key, cyan.syntax));
+        const allPossibleInverseFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseFlagWithAllSyntax(key, cyan.syntax));
+
         return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
                     if (!file.ignore.inlineResolver.content) return;
                     if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
-                        str = this.ConstructContentForInlineFlags(str, allPossibleFlagsMap, cyan.comments);
+                        str = this.ConstructContentForInlineFlags(str, allPossibleFlagsMap, cyan.comments, false);
+                        str = this.ConstructContentForInlineFlags(str, allPossibleInverseFlagsMap, cyan.comments, true);
                         file.content = FileContent.String(str);
                     });
                 },
@@ -139,9 +148,10 @@ class InlineFlagResolver implements IParsingStrategy {
         });
 	};
 
-    ConstructContentForInlineFlags(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[]): string {
+    ConstructContentForInlineFlags(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[], isInverse: boolean): string {
         allPossibleSignatureMap
             .Each((allSignatures: string[], val: boolean) => {
+                if (isInverse) val = !val;
                 content = content
                     .LineBreak()
                     .Where((s: string) => this.ShouldKeepStringWithInlineFlag(allSignatures, val, s))
