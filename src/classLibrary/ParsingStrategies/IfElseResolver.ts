@@ -81,8 +81,8 @@ class IfElseResolver implements IParsingStrategy {
 
 	ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
-        const allPossibleIfSyntaxesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
-		const allPossibleInverseIfSyntaxesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseIfWithAllSyntax(key, cyan.syntax));
+        const allPossibleIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
+		const allPossibleInverseIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseIfWithAllSyntax(key, cyan.syntax));
         return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
@@ -90,11 +90,11 @@ class IfElseResolver implements IParsingStrategy {
                     if (file["content"] == null) return;
 					
                     FileContent.if.String(file.content, (strContent: string) => {
-                        allPossibleIfSyntaxesMap.Each((ifSyntaxes: string[], v: boolean) => {
-							ifSyntaxes.Each((ifSyntax: string) => {
-								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSyntax);
+                        allPossibleIfSignaturesMap.Each((ifSignatures: string[], v: boolean) => {
+							ifSignatures.Each((ifSignature: string) => {
+								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSignature);
 								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
-									this.ConvertIfToEndKeyword(ifSyntax));
+									this.ConvertIfToEndKeyword(ifSignature));
 								if (v) {
 									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
 								} else {
@@ -102,12 +102,11 @@ class IfElseResolver implements IParsingStrategy {
 								}	
 							})
 						});
-						allPossibleInverseIfSyntaxesMap.Each((invIfSyntaxes: string[], v: boolean) => {
-							invIfSyntaxes.Each((invIfSyntax: string) => {
-								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSyntax);
+						allPossibleInverseIfSignaturesMap.Each((invIfSignatures: string[], v: boolean) => {
+							invIfSignatures.Each((invIfSignature: string) => {
+								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSignature);
 								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
-									this.ConvertIfToEndKeyword(invIfSyntax));
-								
+									this.ConvertIfToEndKeyword(invIfSignature));
 								if (!v) {
 									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
 								} else {
@@ -126,11 +125,11 @@ class IfElseResolver implements IParsingStrategy {
 		
 	};
 
-	RetrieveLineIndexContainingSyntax(strContent: string, syntax: string): number[] {
+	RetrieveLineIndexContainingSyntax(strContent: string, signature: string): number[] {
 		let index: number[] = strContent
 								.LineBreak()
 								.Map((s: string, i: number) => [s, i] as [string, number])
-								.Where((n: [string, number]) => n[0].includes(syntax))
+								.Where((n: [string, number]) => n[0].includes(signature))
 								.Map((n: [string, number]) => n[1]);
 		return index;
 	}
