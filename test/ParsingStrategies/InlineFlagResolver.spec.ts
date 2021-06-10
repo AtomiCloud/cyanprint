@@ -761,13 +761,13 @@ eget finibus venenatis.`;
     });
 
     describe("ConstructContentForInlineFlags", () => {
-        it("should remove all content between lines", () => {
-            let content: string = "line2\nflag{{a#help me!\nViolets are blueflag{~a~}\nflag${a}$Oreos are black!!";
+        it("should construct content for inline flags", () => {
+            let content: string = "line2\nflag{{a#help me!\nViolets are blueflag{~a~}\nflag!${a}$Oreos are black!!";
             let allSyntaxes: string[] = inlineFlagResolver.ModifyFlagWithAllSyntax("a", testCyanSafeWithMultiCharacterSyntax.syntax);
             let allPossibleSyntaxMap: Map<string[], boolean> = new Map<string[], boolean>();
             allPossibleSyntaxMap.set(allSyntaxes, true);
             
-            inlineFlagResolver.ConstructContentForInlineFlags(content, allPossibleSyntaxMap, []).should.deep.equal("line2\nhelp me!\nViolets are blue\nOreos are black!!");
+            inlineFlagResolver.ConstructContentForInlineFlags(content, allPossibleSyntaxMap, [], false).should.deep.equal("line2\nhelp me!\nViolets are blue\nflag!${a}$Oreos are black!!");
         });
     });
 
