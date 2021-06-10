@@ -30,7 +30,7 @@ const flags: object = {
 };
 
 const testCyanSafe: CyanSafe = {
-    comments: [],
+    comments: ["//"],
     copyOnly: [],
     flags: flags,
     globs: [],
@@ -42,7 +42,7 @@ const testCyanSafe: CyanSafe = {
 };
 
 const testCyanSafeMultiSyntax: CyanSafe = {
-    comments: [],
+    comments: ["//"],
     copyOnly: [],
     flags: flags,
     globs: [],
@@ -54,7 +54,7 @@ const testCyanSafeMultiSyntax: CyanSafe = {
 }
 
 const testCyanSafeWithMultiCharacterSyntax: CyanSafe = {
-    comments: [],
+    comments: ["//"],
     copyOnly: [],
     flags: flags,
     globs: [],
@@ -492,7 +492,7 @@ Integer quis est vulputate, interdum neque sed, pulvinar lacus.flag#b.d.e#
 Curabitur dolor massa, varius cursus nunc sed, tincidunt mollis est.flag~b.c~
 flag~b.d.f~Orci varius natoque penatibus et magnis dis parturient montes, nascetur 
 flag#g#ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncus
-eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem,flag{b.c}
+eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag{b.c}
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag{b.d.f}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
 Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
@@ -560,7 +560,7 @@ Integer quis est vulputate, interdum neque sed, pulvinar lacus.flag{~b.d.e~}
 Curabitur dolor massa, varius cursus nunc sed, tincidunt mollis est.flag{{b.c#
 flag\${b.d.f}\$Orci varius natoque penatibus et magnis dis parturient montes, nascetur 
 flag##g}ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncus
-eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem,flag\`{b.c}\`
+eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag\`{b.c}\`
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag~~b.d.f}}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
 Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
@@ -646,7 +646,7 @@ Integer quis est vulputate, interdum neque sed, pulvinar lacus.flag{~b.d.e~}
 Curabitur dolor massa, varius cursus nunc sed, tincidunt mollis est.flag{{b.c#
 flag\${b.d.f}\$Orci varius natoque penatibus et magnis dis parturient montes, nascetur 
 flag##g}ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncus
-eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem,flag\`{b.c}\`
+eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag\`{b.c}\`
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag~~b.d.f}}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
 Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
@@ -760,22 +760,22 @@ eget finibus venenatis.`;
         });
     });
 
-    describe("ConstructContentWithCommentsRemoved", () => {
+    describe("ConstructContentForInlineFlags", () => {
         it("should remove all content between lines", () => {
             let content: string = "line2\nflag{{a#help me!\nViolets are blueflag{~a~}\nflag${a}$Oreos are black!!";
             let allSyntaxes: string[] = inlineFlagResolver.ModifyFlagWithAllSyntax("a", testCyanSafeWithMultiCharacterSyntax.syntax);
             let allPossibleSyntaxMap: Map<string[], boolean> = new Map<string[], boolean>();
             allPossibleSyntaxMap.set(allSyntaxes, true);
             
-            inlineFlagResolver.ConstructContentWithCommentsRemoved(content, allPossibleSyntaxMap, []).should.deep.equal("line2\nhelp me!\nViolets are blue\nOreos are black!!");
+            inlineFlagResolver.ConstructContentForInlineFlags(content, allPossibleSyntaxMap, []).should.deep.equal("line2\nhelp me!\nViolets are blue\nOreos are black!!");
         });
     });
 
-    describe("RemoveLineIndexes", () => {
-        it("should remove all lines", () => {
+    describe("GenerateCommentAndSignatureStrings", () => {
+        it("should generate the comments with the flags behind", () => {
             const signatures = ["flag~a~", "flag#a#"]
-            const expected = ["// commentflag~a~", "// commentflag#a#"];
-            inlineFlagResolver.GenerateCommentAndSignatureStrings(signatures, ["// comment"]).should.deep.equal(expected);
+            const expected = ["//flag~a~", "//flag#a#"];
+            inlineFlagResolver.GenerateCommentsWithSignatureStrings(signatures, ["//"]).should.deep.equal(expected);
         });
     });
 });
