@@ -161,12 +161,117 @@ describe("InlineFlagResolver", () => {
             actual.should.deep.equal(expected);
         });
 
-        
-        it("should count the number of occurrences of each ifend for all different syntaxes", () => {
+        it("should count the number of occurrences of each inverse flag correctly", () => {
             let fileMeta1: IFileSystemInstanceMetadata = {
-                destinationAbsolutePath: "root/flag~a~one/one",
-                relativePath: "flag~a~one/one",
-                sourceAbsolutePath: "root/source/flag~a~one/one"
+                destinationAbsolutePath: "root/flag!~a~one/one",
+                relativePath: "flag!~a~one/one",
+                sourceAbsolutePath: "root/source/flag!~a~one/one"
+            }
+
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nthe color is: flag!~a~\nred flag!~b.c~\nblue"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.c~two/two",
+                relativePath: "flag!~b.c~two/two",
+                sourceAbsolutePath: "root/source/flag!~b.c~two/two"
+            }
+            
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nhelp me! flag!~b.d.e~\n are blue flag!~b.c~\nare black!! flag!~g~"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.d.e~one/31",
+				relativePath: "flag!~b.d.e~one/31",
+				sourceAbsolutePath: "root/source/flag!~b.d.e~one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nare red flag!~b.d.f~\nare blue flag!~b.c~\nare black!! flag!~g~"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafe, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each flag and inverse flag correctly", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~a~one/one",
+                relativePath: "flag!~a~one/one",
+                sourceAbsolutePath: "root/source/flag!~a~one/one"
+            }
+
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nthe color is: flag~a~\nred flag!~b.c~\nblue"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag~b.c~two/two",
+                relativePath: "flag~b.c~two/two",
+                sourceAbsolutePath: "root/source/flag~b.c~two/two"
+            }
+            
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nhelp me! flag!~b.d.e~\n are blue flag~b.c~\nare black!! flag~g~"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag~b.d.e~one/31",
+				relativePath: "flag~b.d.e~one/31",
+				sourceAbsolutePath: "root/source/flag~b.d.e~one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nare red flag!~b.d.f~\nare blue flag~b.c~\nare black!! flag!~g~"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafe, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+        
+        it("should count the number of occurrences of each flag for all different syntaxes", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag{a}one/one",
+                relativePath: "flag{a}one/one",
+                sourceAbsolutePath: "root/source/flag{a}one/one"
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
@@ -213,7 +318,109 @@ describe("InlineFlagResolver", () => {
             actual.should.deep.equal(expected);
         });
 
-        it("should count the number of occurrences of each ifend for multi character syntaxes", () => {
+        it("should count the number of occurrences of each inverse flag for all different syntaxes", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!{a}one/one",
+                relativePath: "flag!{a}one/one",
+                sourceAbsolutePath: "root/source/flag!{a}one/one"
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nare red flag!~a~\nare blue flag!~b.c~"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.c~two/two",
+                relativePath: "flag!~b.c~two/two",
+                sourceAbsolutePath: "root/source/flag!~b.c~two/two"
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nhelp me! flag!~b.d.e~\nare blue flag!#b.c# \nare black!! flag!{g}"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.d.e~one/31",
+				relativePath: "flag!~b.d.e~one/31",
+				sourceAbsolutePath: "root/source/flag!~b.d.e~one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\n are red flag!#b.d.f#\n are blue flag!#b.c#\n are black!! flag!#g#"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafeMultiSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each flag and inverse flag for all different syntaxes", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag{a}one/one",
+                relativePath: "flag{a}one/one",
+                sourceAbsolutePath: "root/source/flag{a}one/one"
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nare red flag!~a~\nare blue flag~b.c~"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.c~two/two",
+                relativePath: "flag!~b.c~two/two",
+                sourceAbsolutePath: "root/source/flag!~b.c~two/two"
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nhelp me! flag~b.d.e~\nare blue flag#b.c# \nare black!! flag!{g}"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag~b.d.e~one/31",
+				relativePath: "flag~b.d.e~one/31",
+				sourceAbsolutePath: "root/source/flag~b.d.e~one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\n are red flag!#b.d.f#\n are blue flag#b.c#\n are black!! flag!#g#"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafeMultiSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+        
+        it("should count the number of occurrences of each flag for multi character syntaxes", () => {
             let fileMeta1: IFileSystemInstanceMetadata = {
                 destinationAbsolutePath: "root/flag{{a#one/one",
                 relativePath: "flag{{a#one/one",
@@ -264,15 +471,117 @@ describe("InlineFlagResolver", () => {
             actual.should.deep.equal(expected);
         });
 
-        it("should not count flags for files marked to be not parsed, ignoring the file metadata", () => {
+        it("should count the number of occurrences of each inverse flag for multi character syntaxes", () => {
             let fileMeta1: IFileSystemInstanceMetadata = {
-                destinationAbsolutePath: "root/flag{~a~}one/one",
-                relativePath: "flag{~a~}one/one",
-                sourceAbsolutePath: "root/source/flag{~a~}one/one"
+                destinationAbsolutePath: "root/flag!{{a#one/one",
+                relativePath: "flag!{{a#one/one",
+                sourceAbsolutePath: "root/source/flag!{{a#one/one"
             }
             let file1 = VirtualFileSystemInstance.File({
                 metadata: fileMeta1,
-                content: FileContent.String("line1\nare red flag~~a}}\n are blue flag{{b.c#"),
+                content: FileContent.String("line1\n are redflag!~~a}}\n are blue flag!{{b.c#\nwhatever"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!${b.c}$two/two",
+                relativePath: "flag!${b.c}$two/two",
+                sourceAbsolutePath: "root/source/flag!${b.c}$two/two"
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif\n help me! flag!##b.d.e}\n are blue flag!{{b.c#\n are black!! flag!${g}$"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!{~b.d.e~}one/31",
+				relativePath: "flag!{~b.d.e~}one/31",
+				sourceAbsolutePath: "root/source/flag!{~b.d.e~}one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\n are red flag!`{b.d.f}`\n are blue flag!{{b.c#\n are black!! flag!{~g~}"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should count the number of occurrences of each flag and inverse flag for multi character syntaxes", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag{{a#one/one",
+                relativePath: "flag{{a#one/one",
+                sourceAbsolutePath: "root/source/flag{{a#one/one"
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\n are redflag~~a}}\n are blue flag!{{b.c#\nwhatever"),
+                ignore: parseAll,
+            });
+
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!${b.c}$two/two",
+                relativePath: "flag!${b.c}$two/two",
+                sourceAbsolutePath: "root/source/flag!${b.c}$two/two"
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif\n help me! flag##b.d.e}\n are blue flag!{{b.c#\n are black!! flag${g}$"),
+                ignore: parseAll,
+            });
+
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag{~b.d.e~}one/31",
+				relativePath: "flag{~b.d.e~}one/31",
+				sourceAbsolutePath: "root/source/flag{~b.d.e~}one/31",
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\n are red flag!`{b.d.f}`\n are blue flag{{b.c#\n are black!! flag!{~g~}"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+
+            let expected: [string, number][] = ([
+                ["a", 2],
+                ["b.c", 4],
+                ["b.d.e", 2],
+                ["b.d.f", 1],
+                ["g", 2]
+            ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
+
+            let actual: [string, number][] = inlineFlagResolver.Count(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .SortByKey(SortType.AtoZ)
+                .Arr();
+
+            actual.should.deep.equal(expected);
+        });
+
+        it("should not count flags for files marked to be not parsed, ignoring the file metadata", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!{~a~}one/one",
+                relativePath: "flag!{~a~}one/one",
+                sourceAbsolutePath: "root/source/flag!{~a~}one/one"
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nare red flag!~~a}}\n are blue flag{{b.c#"),
                 ignore: parseMetadata,
             });
 
@@ -283,18 +592,18 @@ describe("InlineFlagResolver", () => {
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\n help me! flag##b.d.e}\n are blue flag{{b.c#\n are black!! flag${g}$"),
+                content: FileContent.String("line2\n help me! flag!##b.d.e}\n are blue flag{{b.c#\n are black!! flag${g}$"),
                 ignore: parseAll,
             });
 
             let fileMeta3: IFileSystemInstanceMetadata = {
-                destinationAbsolutePath: "root/flag~~b.d.e}}one/31",
-				relativePath: "flag~~b.d.e}}one/31",
-				sourceAbsolutePath: "root/source/flag~~b.d.e}}one/31",
+                destinationAbsolutePath: "root/flag!~~b.d.e}}one/31",
+				relativePath: "flag!~~b.d.e}}one/31",
+				sourceAbsolutePath: "root/source/flag!~~b.d.e}}one/31",
             }
             let file3 = VirtualFileSystemInstance.File({
                 metadata: fileMeta3,
-                content: FileContent.String("line2\n are red flag~~b.d.f}}\n are blue flag{{b.c#\n are black!! flag{~g~}"),
+                content: FileContent.String("line2\n are red flag!~~b.d.f}}\n are blue flag{{b.c#\n are black!! flag{~g~}"),
                 ignore: parseContent,
             });
 
@@ -320,9 +629,9 @@ describe("InlineFlagResolver", () => {
             });
 
             let folderMeta2: IFileSystemInstanceMetadata = {
-                destinationAbsolutePath: "root/flag{{b.d.e##one/31",
-				relativePath: "flag{{b.d.e##one/31",
-				sourceAbsolutePath: "root/source/flag{{b.d.e##one/31",
+                destinationAbsolutePath: "root/flag!{{b.d.e##one/31",
+				relativePath: "flag!{{b.d.e##one/31",
+				sourceAbsolutePath: "root/source/flag!{{b.d.e##one/31",
             }
             let folder2 = VirtualFileSystemInstance.Folder({
                 metadata: folderMeta2,
@@ -371,7 +680,6 @@ describe("InlineFlagResolver", () => {
                 ignore: parseAll,
             });
 
-            //b.d.e = false
             let fileMeta3: IFileSystemInstanceMetadata = {
                 destinationAbsolutePath: "root/flag~b.d.e~one/31",
 				relativePath: "flag~b.d.e~one/31",
@@ -383,7 +691,18 @@ describe("InlineFlagResolver", () => {
                 ignore: parseAll,
             });
 
-            let testSubjects = [file1, file2, file3];
+            let fileMeta4: IFileSystemInstanceMetadata = {
+                destinationAbsolutePath: "root/flag!~b.c~two/two",
+                relativePath: "flag!~b.c~two/two",
+                sourceAbsolutePath: "root/source/flag!~b.c~two/two"
+            }
+            let file4 = VirtualFileSystemInstance.File({
+                metadata: fileMeta4,
+                content: FileContent.String("line1\nthe color is: flag~a~\nred flag~b.c~\nblue"),
+                ignore: parseAll,
+            });
+
+            let testSubjects = [file1, file2, file3, file4];
             
             let fileMeta1Expected: IFileSystemInstanceMetadata = {
                 destinationAbsolutePath: "root/one/one",
@@ -426,9 +745,9 @@ flag~b.d.f~Orci varius natoque penatibus et magnis dis parturient montes, nascet
 flag~g~ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncus
 eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, 
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
-eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
+eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. flag!~b.d.e~
 Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
-Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
+flag!~b.d.f~Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
 eget finibus venenatis.`;
 			let expectedContent: string =
 				`Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
@@ -460,7 +779,7 @@ eget finibus venenatis.`;
             
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nflag~b.d.e~help me!\nViolets are blueflag~b.c~\nflag~g~Oreos are black!!"),
+                content: FileContent.String("line2\nflag~b.d.e~help me!\nViolets are blueflag!~b.c~\nflag~g~Oreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -474,7 +793,7 @@ eget finibus venenatis.`;
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nOreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -484,7 +803,7 @@ eget finibus venenatis.`;
             actual.should.deep.equal(expected)
         });
        
-        it("should remove lines with false multi syntax flags, keep lines with true multi syntax flags with flags removed correctly", () => {
+        it("should resolve multi syntax flags content correctly", () => {
             
             let content: string =
 				`Lorem ipsum dolor sit amet, //flag~a~ consectetur adipiscing elit.
@@ -495,8 +814,8 @@ flag#g#ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncus
 eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag{b.c}
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag{b.d.f}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
-Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
-Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
+Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. flag!{b.d.e}
+flag!#b.d.e#Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
 eget finibus venenatis.`;
 			let expectedContent: string =
 				`Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
@@ -528,7 +847,7 @@ eget finibus venenatis.`;
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nHelp me!flag#b.d.e#\nflag{b.c}Violets are blue\nOreos are black!!flag~g~"),
+                content: FileContent.String("line2\nHelp me!flag#b.d.e#\nflag!{b.c}Violets are blue\nOreos are black!!flag~g~"),
                 ignore: parseAll,
             });
 
@@ -542,7 +861,7 @@ eget finibus venenatis.`;
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nOreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -553,7 +872,7 @@ eget finibus venenatis.`;
         });
 
          
-        it("should remove lines with false multi character flags, keep lines with true multi character flags with flags removed correctly", () => {
+        it("should resolve multi character flags content correctly", () => {
             let content: string =
 				`Lorem ipsum dolor sit amet, //flag{{a# consectetur adipiscing elit.
 Integer quis est vulputate, interdum neque sed, pulvinar lacus.flag{~b.d.e~} 
@@ -563,8 +882,8 @@ flag##g}ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncu
 eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag\`{b.c}\`
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag~~b.d.f}}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
-Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
-Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
+Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. flag!##b.d.e}
+flag!{~b.d.f~}Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
 eget finibus venenatis.`;
 			let expectedContent: string =
 				`Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
@@ -596,7 +915,7 @@ eget finibus venenatis.`;
             }
             let file2 = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nflag{{b.d.e#help me!\nViolets are blueflag{~b.c~}\nflag${g}$Oreos are black!!"),
+                content: FileContent.String("line2\nflag{{b.d.e#help me!\nViolets are blueflag!{~b.c~}\nflag${g}$Oreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -610,7 +929,7 @@ eget finibus venenatis.`;
 
             let file2Expected = VirtualFileSystemInstance.File({
                 metadata: fileMeta2,
-                content: FileContent.String("line2\nViolets are blue\nOreos are black!!"),
+                content: FileContent.String("line2\nOreos are black!!"),
                 ignore: parseAll,
             });
 
@@ -649,8 +968,8 @@ flag##g}ridiculus mus. Donec eu velit fermentum, maximus tortor sit amet, rhoncu
 eros. Nullam semper libero in ullamcorper rhoncus. Fusce ligula sem, flag\`{b.c}\`
 fringilla non enim vitae, congue interdum mi. Ut sed ex et neque laoreet 
 flag~~b.d.f}}eleifend. Donec maximus urna eros. Nunc gravida sollicitudin dignissim. 
-Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. 
-Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
+Sed consequat ipsum at congue vulputate. In ac ipsum vel dui pellentesque blandit. flag!{{b.d.e#
+flag!\${b.d.f}\$Pellentesque tempus quis orci eu vulputate. Fusce vehicula nibh 
 eget finibus venenatis.`;
 			let expectedContent: string =
 				`Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
