@@ -4,9 +4,11 @@ import {IGuidGenerator} from '../interfaces/interfaces';
 class GuidGenerator implements IGuidGenerator {
 
     private static guids: string[] = [];
+    public readonly c: Core;
 
     constructor(core: Core) {
         core.AssertExtend();
+        this.c = core;
     }
 
     GenerateGuid(): string {

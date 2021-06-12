@@ -60,8 +60,8 @@ class GuidResolver implements IParsingStrategy {
                     if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
                         guidsMap
-                            .Each((s: string, v: string) => {
-                                str = str.ReplaceAll(s.toLowerCase(), v).ReplaceAll(s.toUpperCase(), v);    
+                            .Each((k: string, v: string) => {
+                                str = str.ReplaceAll(k.toLowerCase(), v).ReplaceAll(k.toUpperCase(), v);    
                             });
                         file.content = FileContent.String(str);
                     });
@@ -73,20 +73,24 @@ class GuidResolver implements IParsingStrategy {
         });
     }
 
-    /**ReplaceGuid(guidArr: Map<string, string>, f: FileSystemInstance): FileSystemInstance {
+    ReplaceGuid(guidArr: Map<string, string>, virtualFile: VirtualFileSystemInstance) {
         let upper: Map<string, string> = guidArr.MapKey((s: string) => s.toUpperCase());
         let lower: Map<string, string> = guidArr.MapKey((s: String) => s.toLowerCase());
-        if (f["content"] != null && !f["binary"]) {
-            let file: IFile = f as IFile;
-            let content = file.content;
-            upper.Each((k: string, v: string) => content = content.ReplaceAll(k, v));
-            lower.Each((k: string, v: string) => content = content.ReplaceAll(k, v));
-            file.content = content;
-            return file;
-        }
-        return f;
+        return VirtualFileSystemInstance.match(virtualFile, {
+            File: (file: FileSystemInstance) => {
+                if (!file.ignore.guidResolver.content) return;
+                if (file["content"] == null) return;
+                FileContent.if.String(file.content, (str: string) => {
+                    upper.Each((k: string, v: string) => str = str.ReplaceAll(k, v));
+                    lower.Each((k: string, v: string) => str = str.ReplaceAll(k, v));
+                    file.content = FileContent.String(str);
+                });
+            },
+            default: () => {
+                return;
+            }
+        });
     }
- */
 }
 
 export { GuidResolver };
