@@ -5,7 +5,7 @@ import {
     IFileSystemInstanceMetadata,
     Ignore,
     IGuidGenerator,
-    VirtualFileSystemInstance
+    VirtualFileSystemInstance,
 } from "../../src/classLibrary/interfaces/interfaces";
 import { Core, Kore, SortType } from "@kirinnee/core";
 import { GuidResolver } from "../../src/classLibrary/ParsingStrategies/GuidResolver";
@@ -498,6 +498,41 @@ describe("GuidResolver", () => {
 
             let actual = guidResolver.ResolveContents(testCyanSafe, testSubjects);
             actual.should.deep.equal(expected)
+        });
+    });
+
+    describe("ReplaceGuid", () => {
+        it("should replace both upper and lower case occurence of the guid", () => {
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: "root/from",
+                destinationAbsolutePath: "root/dest",
+                relativePath: "root/rel"
+            }
+            let file1: VirtualFileSystemInstance = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("6de0a74e-70a9-4cfc-be14-04789ecd44fa\n" +
+                    "lol\n" +
+                    "BC6B7B1A-6E23-4CD4-A6E7-4291F8238DD1\n" +
+                    "4093f5bc-bb3d-4de7-b1d2-7220e66a0675"),
+                ignore: parseAll
+            });
+
+            let guidArr: Map<string, string> = new Map([
+                ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", "guid1"],
+                ["bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1", "guid2"]
+            ]);
+
+            let expected: VirtualFileSystemInstance = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("guid1\n" +
+                    "lol\n" +
+                    "guid2\n" +
+                    "4093f5bc-bb3d-4de7-b1d2-7220e66a0675"),
+                ignore: parseAll
+            });
+
+            guidResolver.ReplaceGuid(guidArr, file1);
+            file1.should.deep.equal(expected);
         });
     });
 });
