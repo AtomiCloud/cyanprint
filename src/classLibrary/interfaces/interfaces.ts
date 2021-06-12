@@ -37,6 +37,10 @@ interface IFileSystemInstanceMetadata {
 	relativePath: string;
 }
 
+interface IGuidGenerator {
+    GenerateGuid(): string;
+}
+
 const FileContent = Union({
 	String: of<string>(),
 	Buffer: of<Buffer>(),
@@ -113,6 +117,7 @@ export {
 	CyanSafe,
 	ICyanParser,
 	IFileSystemInstanceMetadata,
+	IGuidGenerator,
 	FileSystemInstance,
 	IGlobFactory,
 	IFileFactory,
