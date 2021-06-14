@@ -4,7 +4,7 @@ import {FileSystemInstance,
 	VirtualFileSystemInstance,
 	IParsingStrategy,
 	Syntax,
-	CyanSafe
+	CyanSafe,
 	} from "../interfaces/interfaces";
 
 class IfElseResolver implements IParsingStrategy {
@@ -147,6 +147,64 @@ class IfElseResolver implements IParsingStrategy {
 		return strContent.LineBreak().WithoutIndex(lineIndexes).join('\n');
 	}
 	
+	//Untested
+	ModifyIfRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleIfs: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleIfs.push(`/if${syntax[0]}[^~]*${syntax[1]}/g`);
+		})
+		return allPossibleIfs;
+	}
+
+	ModifyInverseIfRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleIfs: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleIfs.push(`/if!${syntax[0]}[^~]*${syntax[1]}/g`);
+		})
+		return allPossibleIfs;
+	}
+
+	CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] 
+	{
+		const syntaxes: Syntax[] = cyan.syntax;
+		const result: string[] = [];
+		virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
+			const allPossibleIfRegExps: string[] = this.ModifyIfRegExpWithAllSyntax(syntaxes).concat(this.ModifyInverseIfRegExpWithAllSyntax(syntaxes));
+			allPossibleIfRegExps.Each((regExpString: string) => {
+				result.concat(this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+			});	
+		});
+		return result;
+	}
+
+	CountUnaccountedKeyInVFS(key:string, virtualFile: VirtualFileSystemInstance): string[]
+	{
+		return VirtualFileSystemInstance.match(virtualFile, {
+			File: (file: FileSystemInstance) => {
+				if (!file.ignore.ifElseResolver.content) return [];
+				if (file["content"] == null) return [];
+
+				FileContent.if.String(file.content, (strContent: string) => {
+					return strContent
+						.LineBreak()
+						.Map(s => {
+							let ifRegExp = new RegExp(key);
+							let endRegExp = new RegExp(this.ConvertIfToEndKeyword(key));
+							s.Match(ifRegExp).concat(s.Match(endRegExp))
+						})
+						.Flatten()
+						.Map(s => `${s}:${file.metadata.relativePath}`)
+						.Flatten();
+				});
+				return [];
+			},
+			default: () => { 
+				return [];
+			}
+		});
+	}
 }
 
 export { IfElseResolver };
