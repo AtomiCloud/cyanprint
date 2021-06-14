@@ -16,30 +16,34 @@ interface CyanObject {
 
 // Parsed version
 interface CyanSafe {
-    globs: Glob[];
-    copyOnly: Glob[];
-    variable: object;
-    flags: object;
-    guid: string[];
-    syntax: Syntax[];
-    plugins: { [s: string]: string[] };
-    comments: string[];
-    pluginData: object;
+	globs: Glob[];
+	copyOnly: Glob[];
+	variable: object;
+	flags: object;
+	guid: string[];
+	syntax: Syntax[];
+	plugins: { [s: string]: string[] };
+	comments: string[];
+	pluginData: object;
 }
 
 interface ICyanParser {
-    Parse(p: Partial<CyanObject>): CyanSafe;
+	Parse(p: Partial<CyanObject>): CyanSafe;
 }
 
 interface IFileSystemInstanceMetadata {
-    sourceAbsolutePath: string;
-    destinationAbsolutePath: string;
-    relativePath: string;
+	sourceAbsolutePath: string;
+	destinationAbsolutePath: string;
+	relativePath: string;
+}
+
+interface IGuidGenerator {
+    GenerateGuid(): string;
 }
 
 const FileContent = Union({
-    String: of<string>(),
-    Buffer: of<Buffer>(),
+	String: of<string>(),
+	Buffer: of<Buffer>(),
 });
 
 type FileContent = typeof FileContent.T;
@@ -92,33 +96,34 @@ interface IGlobFactory {
 
 // TODO may need further review
 interface IFileFactory {
-    CreateFileSystemInstance(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
+	CreateFileSystemInstance(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
 
-    // Callback is used to bump progress
-    ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<FileSystemInstance>;
+	// Callback is used to bump progress
+	ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<FileSystemInstance>;
 }
 
 interface IParsingStrategy {
-    ResolveContents(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
+	ResolveContents(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 
-    Count(cyan: CyanSafe, files: VirtualFileSystemInstance[]): Map<string, number>;
+	Count(cyan: CyanSafe, files: VirtualFileSystemInstance[]): Map<string, number>;
 
-    ResolveFiles(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
+	ResolveFiles(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 }
 
 export {
-    Glob,
-    Syntax,
-    CyanObject,
-    CyanSafe,
-    ICyanParser,
-    IFileSystemInstanceMetadata,
-    FileSystemInstance,
-    IGlobFactory,
-    IFileFactory,
-    IParsingStrategy,
-    FileContent,
-    DirectorySystemInstance,
-    VirtualFileSystemInstance,
-    Ignore
+	Glob,
+	Syntax,
+	CyanObject,
+	CyanSafe,
+	ICyanParser,
+	IFileSystemInstanceMetadata,
+	IGuidGenerator,
+	FileSystemInstance,
+	IGlobFactory,
+	IFileFactory,
+	IParsingStrategy,
+	FileContent,
+	DirectorySystemInstance,
+	VirtualFileSystemInstance,
+	Ignore
 };
