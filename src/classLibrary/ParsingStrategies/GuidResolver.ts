@@ -19,7 +19,7 @@ class GuidResolver implements IParsingStrategy {
         const result: Map<string, number> = new Map<string, number>();
         virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             guids.Each((guid: string) => {
-                const count = this.CountKeyInVFS(guid, virtualFile);
+                const count = this.CountGuidInVFS(guid, virtualFile);
 
                 if (result.has(guid)) {
                     result.set(guid, result.get(guid)! + count);
@@ -32,7 +32,7 @@ class GuidResolver implements IParsingStrategy {
         return result;
     }
 
-    private CountKeyInVFS(key: string, virtualFile: VirtualFileSystemInstance): number {
+    private CountGuidInVFS(key: string, virtualFile: VirtualFileSystemInstance): number {
         return VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
                 let tempCount = 0;
