@@ -1,6 +1,14 @@
 import { of, Union } from "ts-union";
 
-type Syntax = [string,string] // [open, close] , [ ["~", "~"] , ["{{"], ["}}"]]
+//  ██████╗██╗   ██╗ █████╗ ███╗   ██╗
+// ██╔════╝╚██╗ ██╔╝██╔══██╗████╗  ██║
+// ██║      ╚████╔╝ ███████║██╔██╗ ██║
+// ██║       ╚██╔╝  ██╔══██║██║╚██╗██║
+// ╚██████╗   ██║   ██║  ██║██║ ╚████║
+//  ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝
+//
+
+type Syntax = [string, string] // [open, close] , [ ["~", "~"] , ["{{"], ["}}"]]
 type CyanFlag = { [s:string] : boolean | CyanFlag }
 type  CyanVariable = { [s:string] : string | CyanVariable }
 
@@ -32,6 +40,14 @@ interface CyanSafe {
 interface ICyanParser {
     Parse(p: Partial<CyanObject>): CyanSafe;
 }
+
+// ██╗   ██╗███████╗███████╗     █████╗ ███╗   ██╗██████╗     ███████╗███████╗
+// ██║   ██║██╔════╝██╔════╝    ██╔══██╗████╗  ██║██╔══██╗    ██╔════╝██╔════╝
+// ██║   ██║█████╗  ███████╗    ███████║██╔██╗ ██║██║  ██║    █████╗  ███████╗
+// ╚██╗ ██╔╝██╔══╝  ╚════██║    ██╔══██║██║╚██╗██║██║  ██║    ██╔══╝  ╚════██║
+//  ╚████╔╝ ██║     ███████║    ██║  ██║██║ ╚████║██████╔╝    ██║     ███████║
+//   ╚═══╝  ╚═╝     ╚══════╝    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝     ╚═╝     ╚══════╝
+//
 
 interface IFileSystemInstanceMetadata {
     sourceAbsolutePath: string;
@@ -104,6 +120,14 @@ interface IFileFactory {
     ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<FileSystemInstance>;
 }
 
+// ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ██╗ ██████╗
+// ██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗  ██║██╔════╝
+// ██████╔╝███████║██████╔╝███████╗██║██╔██╗ ██║██║  ███╗
+// ██╔═══╝ ██╔══██║██╔══██╗╚════██║██║██║╚██╗██║██║   ██║
+// ██║     ██║  ██║██║  ██║███████║██║██║ ╚████║╚██████╔╝
+// ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝
+//
+
 interface IParsingStrategy {
     ResolveContents(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 
@@ -112,6 +136,33 @@ interface IParsingStrategy {
     ResolveFiles(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
 
     CountPossibleUnaccountedFlags(cyan: CyanSafe,files: VirtualFileSystemInstance[]): string[];
+}
+
+
+// ███████╗██╗   ██╗ █████╗ ██╗     ██╗   ██╗ █████╗ ████████╗██╗ ██████╗ ███╗   ██╗
+// ██╔════╝██║   ██║██╔══██╗██║     ██║   ██║██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║
+// █████╗  ██║   ██║███████║██║     ██║   ██║███████║   ██║   ██║██║   ██║██╔██╗ ██║
+// ██╔══╝  ╚██╗ ██╔╝██╔══██║██║     ██║   ██║██╔══██║   ██║   ██║██║   ██║██║╚██╗██║
+// ███████╗ ╚████╔╝ ██║  ██║███████╗╚██████╔╝██║  ██║   ██║   ██║╚██████╔╝██║ ╚████║
+// ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+//
+
+interface IAsker {
+    // Asks a yes-no question.
+    AskPredicate(): Promise<Boolean>;
+
+    // Ask for user input and return a Map of variable to user's answer.
+    AskForInput(): Promise<object>;
+
+    // Ask user in form of checkbox, checked keys will have True values, the rest will have False values.
+    AskAsCheckbox(): Promise<object>;
+
+    // Multiple options, only one answer. Chosen option will have True value, the rest will have False values.
+    AskAsList(): Promise<object>;
+}
+
+interface IEvaluator {
+
 }
 
 export {
@@ -131,5 +182,7 @@ export {
     FileContent,
     DirectorySystemInstance,
     VirtualFileSystemInstance,
-    Ignore
+    Ignore,
+    IAsker,
+    IEvaluator
 };
