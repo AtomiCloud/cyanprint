@@ -24,7 +24,6 @@ class CLIAsker implements IAsker {
         const answer: Answers = await inquirer.prompt([
             questionObject
         ]);
-
         return answer["predicate"] === yesOption;
     }
 
