@@ -148,8 +148,8 @@ interface IParsingStrategy {
 //
 
 interface IAsker {
-    // Asks a yes-no question.
-    AskPredicate(): Promise<Boolean>;
+    // Asks a yes-no question, with optional configuration for Yes and No text options
+    AskPredicate(question: string, yesOption: string, noOption: string): Promise<Boolean>;
 
     // Ask for user input and return a Map of variable to user's answer.
     AskForInput(): Promise<object>;
