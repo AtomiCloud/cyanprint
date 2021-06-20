@@ -139,6 +139,10 @@ interface IParsingStrategy {
 // ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 //
 
+interface ListInputs {
+    [flag: string]: any; // Can be object or string
+}
+
 interface IAsker {
     // Asks a yes-no question, with optional configuration for Yes and No text options
     AskPredicate(question: string, yesOption: string, noOption: string): Promise<Boolean>;
@@ -150,7 +154,7 @@ interface IAsker {
     AskAsCheckbox(): Promise<object>;
 
     // Multiple options, only one answer. Chosen option will have True value, the rest will have False values.
-    AskAsList(): Promise<object>;
+    AskAsList(options: ListInputs, question: string): Promise<object>;
 }
 
 interface IEvaluator {
@@ -172,6 +176,7 @@ export {
     DirectorySystemInstance,
     VirtualFileSystemInstance,
     Ignore,
+    ListInputs,
     IAsker,
     IEvaluator
 };
