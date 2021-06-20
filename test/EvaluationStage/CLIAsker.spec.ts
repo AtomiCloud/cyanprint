@@ -129,4 +129,82 @@ describe("CLIAsker", () => {
             answer.should.deep.equal(expected);
         });
     });
+
+    describe("AskAsCheckbox", () => {
+        let sandbox: SinonSandbox;
+        before(() => {
+            sandbox = sinon.createSandbox();
+        });
+        afterEach(() => {
+            sandbox.restore()
+        });
+
+        it("should return the right selections from user", async () => {
+            const stubReply = {selected: ["Amazon Web Service", "Google Cloud Platform"]};
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const options: ListInputs = {
+                aws: "Amazon Web Service",
+                azure: "Azure Blob Storage",
+                gcp: "Google Cloud Platform",
+                do: "Digital Ocean Spaces",
+            }
+            const answer = await cliAsker.AskAsCheckbox(options, "Which provider do you want to use?");
+            const expected = {
+                aws: true,
+                azure: false,
+                gcp: true,
+                do: false
+            }
+            answer.should.deep.equal(expected);
+        });
+
+        it("should return the right keys for nested options", async () => {
+            const stubReply = {selected: ["Amazon Web Service", "GCP Compute Engine", "Digital Ocean Spaces"]};
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const options: ListInputs = {
+                aws: "Amazon Web Service",
+                azure: "Azure Blob Storage",
+                gcp: {
+                    compute: "GCP Compute Engine",
+                    storage: "GCP Cloud Storage",
+                },
+                do: "Digital Ocean Spaces",
+            }
+            const answer = await cliAsker.AskAsCheckbox(options, "Which provider do you want to use?");
+            const expected = {
+                "aws": true,
+                "azure": false,
+                "gcp.compute": true,
+                "gcp.storage": false,
+                "do": true
+            }
+            answer.should.deep.equal(expected);
+        });
+
+        it("should return the right answers if the selected answer is nested", async () => {
+            const stubReply = {selected: ["GCP Compute Engine", "GCP Cloud Storage", "Azure Blob Storage"]};
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const options: ListInputs = {
+                aws: "Amazon Web Service",
+                azure: "Azure Blob Storage",
+                gcp: {
+                    compute: "GCP Compute Engine",
+                    storage: "GCP Cloud Storage",
+                },
+                do: "Digital Ocean Spaces",
+            }
+            const answer = await cliAsker.AskAsCheckbox(options, "Which provider do you want to use?");
+            const expected = {
+                "aws": false,
+                "azure": true,
+                "gcp.compute": true,
+                "gcp.storage": true,
+                "do": false
+            }
+            answer.should.deep.equal(expected);
+        });
+    });
 });

@@ -159,7 +159,7 @@ interface IAsker {
     AskForInput(): Promise<object>;
 
     // Ask user in form of checkbox, checked keys will have True values, the rest will have False values.
-    AskAsCheckbox(): Promise<object>;
+    AskAsCheckbox(options: ListInputs, question: string): Promise<object>;
 
     // Multiple options, only one answer. Chosen option will have True value, the rest will have False values.
     AskAsList(options: ListInputs, question: string): Promise<object>;
