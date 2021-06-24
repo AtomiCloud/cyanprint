@@ -16,7 +16,7 @@ class IfElseResolver implements IParsingStrategy {
 	}
 	
 	Count(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): Map<string, number> {
-    	const flags: string[] = this.util.FlattenObject(cyan.flags).Keys();
+    	const flags: string[] = this.util.FlattenBooleanValueObject(cyan.flags).Keys();
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
@@ -26,11 +26,7 @@ class IfElseResolver implements IParsingStrategy {
                 allPossibleIfs.Each((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile)
 									.AtMax(this.CountKeyInVFS(this.ConvertIfToEndKeyword(key), virtualFile));
-                    if (result.has(flag)) {
-                        result.set(flag, result.get(flag)! + count);
-                    } else {
-                        result.set(flag, count);
-                    }
+                    this.util.Increase(result, flag, count);
                 });
             });
         });
@@ -42,7 +38,7 @@ class IfElseResolver implements IParsingStrategy {
 		return VirtualFileSystemInstance.match(virtualFile, {
 			File: (file: FileSystemInstance) => {
 				let tempCount = 0;
-				if (file["content"] != null && file.ignore.ifElseResolver.content) {
+				if (file.ignore.ifElseResolver.content) {
 					FileContent.if.String(file.content, (str) => {
 						tempCount += str.Count(key);
 					});
@@ -54,19 +50,11 @@ class IfElseResolver implements IParsingStrategy {
 	}
 
 	ModifyIfWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
-		const allPossibleIfs: string[] = [];
-		syntaxes.Each(syntax => {
-			allPossibleIfs.push(`if${syntax[0] + v + syntax[1]}`);
-		})
-		return allPossibleIfs;
+		return syntaxes.Map( ([start, end]: Syntax) => `if${start + v + end}`);
 	}
 
 	ModifyInverseIfWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
-		const allPossibleInverseIfs: string[] = [];
-		syntaxes.Each(syntax => {
-			allPossibleInverseIfs.push(`if!${syntax[0] + v + syntax[1]}`);
-		})
-		return allPossibleInverseIfs;
+		return syntaxes.Map( ([start, end]: Syntax) => `if!${start + v + end}`);
 	}
 
 	ConvertIfToEndKeyword(ifStatement: string): string
@@ -80,39 +68,20 @@ class IfElseResolver implements IParsingStrategy {
 	};
 
 	ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
-		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
-        const allPossibleIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
+		const flagsMap: Map<string, boolean> = this.util.FlattenBooleanValueObject(cyan.flags);
+		const allPossibleIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
 		const allPossibleInverseIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseIfWithAllSyntax(key, cyan.syntax));
         return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
                     if (!file.ignore.ifElseResolver.content) return;
-                    if (file["content"] == null) return;
 					
                     FileContent.if.String(file.content, (strContent: string) => {
                         allPossibleIfSignaturesMap.Each((ifSignatures: string[], v: boolean) => {
-							ifSignatures.Each((ifSignature: string) => {
-								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, ifSignature);
-								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
-									this.ConvertIfToEndKeyword(ifSignature));
-								if (v) {
-									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
-								} else {
-									strContent = this.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent);
-								}	
-							})
+							strContent = this.ResolveContentBetweenIfSignature(ifSignatures, v, strContent, false);
 						});
 						allPossibleInverseIfSignaturesMap.Each((invIfSignatures: string[], v: boolean) => {
-							invIfSignatures.Each((invIfSignature: string) => {
-								let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, invIfSignature);
-								let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(strContent, 
-									this.ConvertIfToEndKeyword(invIfSignature));
-								if (!v) {
-									strContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), strContent);
-								} else {
-									strContent = this.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent);
-								}	
-							})
+							strContent = this.ResolveContentBetweenIfSignature(invIfSignatures, v, strContent, true);
 						});
 						file.content = FileContent.String(strContent);
                     });
@@ -124,6 +93,23 @@ class IfElseResolver implements IParsingStrategy {
         });
 		
 	};
+
+	ResolveContentBetweenIfSignature(ifSignatures: string[], v: boolean, strContent: string, isInverse: boolean) : string
+	{
+		let resolvedContent = strContent;
+		for (let idx = 0; idx < ifSignatures.length; idx++) {
+			let ifSignature = ifSignatures[idx];
+			let startIndexes: number[] = this.RetrieveLineIndexContainingSyntax(resolvedContent, ifSignature);
+			let endIndexes: number[] = this.RetrieveLineIndexContainingSyntax(resolvedContent, 
+				this.ConvertIfToEndKeyword(ifSignature));
+			if ((!isInverse && v) || (isInverse && !v)) {
+				resolvedContent = this.RemoveLineIndexes(startIndexes.concat(endIndexes), resolvedContent);
+			} else {
+				resolvedContent = this.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, resolvedContent);
+			}	
+		}
+		return resolvedContent;
+	}
 
 	RetrieveLineIndexContainingSyntax(strContent: string, signature: string): number[] {
 		let index: number[] = strContent
@@ -169,11 +155,11 @@ class IfElseResolver implements IParsingStrategy {
 	CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] 
 	{
 		const syntaxes: Syntax[] = cyan.syntax;
-		const result: string[] = [];
+		let result: string[] = [];
 		virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
 			const allPossibleIfRegExps: string[] = this.ModifyIfRegExpWithAllSyntax(syntaxes).concat(this.ModifyInverseIfRegExpWithAllSyntax(syntaxes));
 			allPossibleIfRegExps.Each((regExpString: string) => {
-				result.concat(this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+				result = result.concat(this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
 			});	
 		});
 		return result;
@@ -184,7 +170,6 @@ class IfElseResolver implements IParsingStrategy {
 		return VirtualFileSystemInstance.match(virtualFile, {
 			File: (file: FileSystemInstance) => {
 				if (!file.ignore.ifElseResolver.content) return [];
-				if (file["content"] == null) return [];
 
 				FileContent.if.String(file.content, (strContent: string) => {
 					return strContent

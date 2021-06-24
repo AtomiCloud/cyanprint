@@ -18,15 +18,15 @@ core.ExtendPrimitives();
 const utility: Utility = new Utility(core);
 const ifElseResolver: IfElseResolver = new IfElseResolver(utility);
 const flags: object = {
-    a: "true",
+    a: true,
     b: {
-        c: "true",
+        c: true,
         d: {
-            e: "false",
-            f: "false"
+            e: false,
+            f: false
         }
     },
-    g: "true"
+    g: true
 };
 
 const testCyanSafe: CyanSafe = {
@@ -104,7 +104,6 @@ const parseAll: Ignore = _.defaultsDeep(partialParseAll, templateIgnore)
 const parseMetadata: Ignore = _.defaultsDeep(partialParseMetadata, templateIgnore)
 const parseContent: Ignore = _.defaultsDeep(partialParseContent, templateIgnore)
 const parseNothing: Ignore = _.defaultsDeep(partialParseNothing, templateIgnore)
-
 
 describe("IfElseResolver", () => {
     describe("Count", () => {

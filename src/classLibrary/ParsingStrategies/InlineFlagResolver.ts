@@ -17,7 +17,7 @@ class InlineFlagResolver implements IParsingStrategy {
 	}
 	
 	Count(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): Map<string, number> {
-    	const flags: string[] = this.util.FlattenObject(cyan.flags).Keys();
+    	const flags: string[] = this.util.FlattenBooleanValueObject(cyan.flags).Keys();
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
@@ -26,11 +26,7 @@ class InlineFlagResolver implements IParsingStrategy {
                 const allPossibleIfs = this.ModifyFlagWithAllSyntax(flag, syntaxes).concat(this.ModifyInverseFlagWithAllSyntax(flag, syntaxes));
                 allPossibleIfs.Each((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile);
-                    if (result.has(flag)) {
-                        result.set(flag, result.get(flag)! + count);
-                    } else {
-                        result.set(flag, count);
-                    }
+                    this.util.Increase(result, flag, count);
                 });
             });
         });
@@ -42,7 +38,7 @@ class InlineFlagResolver implements IParsingStrategy {
 		return VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
                 let tempCount = file.ignore.inlineResolver.metadata ? file.metadata.sourceAbsolutePath.Count(key) : 0;
-                if (file["content"] != null && file.ignore.inlineResolver.content) {
+                if (file.ignore.inlineResolver.content) {
                     FileContent.if.String(file.content, (str) => {
                         tempCount += str.Count(key);
                     });
@@ -57,23 +53,15 @@ class InlineFlagResolver implements IParsingStrategy {
 	}
 
 	ModifyFlagWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
-		const allPossibleInlineFlags: string[] = [];
-		syntaxes.Each(syntax => {
-			allPossibleInlineFlags.push(`flag${syntax[0] + v + syntax[1]}`);
-		})
-		return allPossibleInlineFlags;
+        return syntaxes.Map( ([start, end]: Syntax) => `flag${start + v + end}`);
 	}
 
     ModifyInverseFlagWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
-		const allPossibleInverseInlineFlags: string[] = [];
-		syntaxes.Each(syntax => {
-			allPossibleInverseInlineFlags.push(`flag!${syntax[0] + v + syntax[1]}`);
-		})
-		return allPossibleInverseInlineFlags;
+        return syntaxes.Map( ([start, end]: Syntax) => `flag!${start + v + end}`);
 	}
 	
 	ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
-		const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
+		const flagsMap: Map<string, boolean> = this.util.FlattenBooleanValueObject(cyan.flags);
 		const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((flag: string) => this.ModifyFlagWithAllSyntax(flag, cyan.syntax));
         const allPossibleInverseFlagsMap: Map<string[], boolean> = flagsMap.MapKey((flag: string) => this.ModifyInverseFlagWithAllSyntax(flag, cyan.syntax));
 
@@ -117,16 +105,16 @@ class InlineFlagResolver implements IParsingStrategy {
     RemoveFlagFromMetadataDestinationPath(signatures: string[], virtualFile: VirtualFileSystemInstance) {
         VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
-                file.metadata.destinationAbsolutePath = file.metadata.destinationAbsolutePath.Without(signatures.Map((s: string) => s));
+                file.metadata.destinationAbsolutePath = file.metadata.destinationAbsolutePath.Without(signatures);
             },
             Folder: (folder: DirectorySystemInstance) => {
-                folder.metadata.destinationAbsolutePath = folder.metadata.destinationAbsolutePath.Without(signatures.Map((s: string) => s));
+                folder.metadata.destinationAbsolutePath = folder.metadata.destinationAbsolutePath.Without(signatures);
             },
         });
 	};
 
 	ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
-        const flagsMap: Map<string, boolean> = this.util.FlattenObject(cyan.flags).MapValue((boolString: string) => boolString == "true");
+        const flagsMap: Map<string, boolean> = this.util.FlattenBooleanValueObject(cyan.flags);
         const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyFlagWithAllSyntax(key, cyan.syntax));
         const allPossibleInverseFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseFlagWithAllSyntax(key, cyan.syntax));
 
@@ -134,7 +122,6 @@ class InlineFlagResolver implements IParsingStrategy {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
                     if (!file.ignore.inlineResolver.content) return;
-                    if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
                         str = this.ConstructContentForInlineFlags(str, allPossibleFlagsMap, cyan.comments, false);
                         str = this.ConstructContentForInlineFlags(str, allPossibleInverseFlagsMap, cyan.comments, true);

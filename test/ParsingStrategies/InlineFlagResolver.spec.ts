@@ -18,15 +18,15 @@ core.ExtendPrimitives();
 const utility: Utility = new Utility(core);
 const inlineFlagResolver: InlineFlagResolver = new InlineFlagResolver(utility);
 const flags: object = {
-    a: "true",
+    a: true,
     b: {
-        c: "true",
+        c: true,
         d: {
-            e: "false",
-            f: "false"
+            e: false,
+            f: false
         }
     },
-    g: "true"
+    g: true
 };
 
 const testCyanSafe: CyanSafe = {

@@ -10,6 +10,7 @@ import {
 import { Core, Kore, SortType } from "@kirinnee/core";
 import { GuidResolver } from "../../src/classLibrary/ParsingStrategies/GuidResolver";
 import _ from 'lodash';
+import { Utility } from '../../src/classLibrary/Utility/Utility';
 
 should();
 let core: Core = new Kore();
@@ -25,7 +26,8 @@ class MockGuidGenerator implements IGuidGenerator {
 }
 
 const guidGenerator: MockGuidGenerator = new MockGuidGenerator();
-const guidResolver: GuidResolver = new GuidResolver(guidGenerator);
+const util: Utility = new Utility(core);
+const guidResolver: GuidResolver = new GuidResolver(guidGenerator, util);
 const guids: string[] = ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", "bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1"];
 
 const testCyanSafe: CyanSafe = {

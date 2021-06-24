@@ -15,7 +15,7 @@ export class Utility {
         process.exit(1);
     }
 
-    FlattenObject(obj: any, prepend: string = ''): Map<string, string> {
+    FlattenStringValueObject(obj: any, prepend: string = ''): Map<string, string> {
         let c = this.c;
 
         let ret: Map<string, string> = new Map<string, string>();
@@ -30,7 +30,7 @@ export class Utility {
                         Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                     }
                 } else if (typeof data === "object") {
-                    ret = new Map<string, string>(ret.Arr().Union(this.FlattenObject(data, prepend + k + '.').Arr(), true));
+                    ret = new Map<string, string>(ret.Arr().Union(this.FlattenStringValueObject(data, prepend + k + '.').Arr(), true));
                 } else {
                     Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                 }
@@ -38,4 +38,49 @@ export class Utility {
         }
         return ret;
     }
+
+    FlattenBooleanValueObject(obj: any, prepend: string = ''): Map<string, boolean> {
+        let ret: Map<string, boolean> = new Map<string, boolean>();
+        for (let k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                let data = obj[k];
+                if (typeof data === "boolean" || (typeof data === 'object' && data !== null && typeof data.valueOf() === 'boolean')) {
+                    ret.set(prepend + k, data);
+                } else if (typeof data === "object") {
+                    ret = new Map<string, any>(ret.Arr().Union(this.FlattenBooleanValueObject(data, prepend + k + '.').Arr(), true));
+                } else {
+                    Utility.Throw('Type', 'Every field cannot be empty: fields ' + k, obj);
+                }
+            }
+        }
+        return ret;
+    }
+
+    FlattenNumberValueObject(obj: any, prepend: string = ''): Map<string, number> {
+        let ret: Map<string, number> = new Map<string, number>();
+        let c = this.c;
+        for (let k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                let data = obj[k];
+                if (c.IsAnyNumber(data)) {
+                    if (c.IsNumber(data)) {
+                        ret.set(prepend + k, data);
+                    } else {
+                        Utility.Throw('Type', 'Every field cannot be empty: fieldsss ' + k, obj);
+                    }
+                } else {
+                    Utility.Throw('Type', 'Every field cannot be empty: fields ' + k, obj);
+                }
+            }
+        }
+        return ret;
+    }
+
+    Increase<T>(m: Map<T,number>, key: T, amount: number) {
+        if (m.has(key)) {
+          m.set(key, m.get(key)! + amount)
+        } else {
+          m.set(key, amount);
+        }
+    } 
 }

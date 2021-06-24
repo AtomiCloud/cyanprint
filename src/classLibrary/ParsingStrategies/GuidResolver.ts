@@ -6,12 +6,15 @@ import {
     IParsingStrategy,
     VirtualFileSystemInstance
 } from "../interfaces/interfaces";
+import { Utility } from "../Utility/Utility";
 
 class GuidResolver implements IParsingStrategy {
     private guidGenerator: IGuidGenerator;
+    private util: Utility;
 
-    constructor(guidGenerator: IGuidGenerator) {
+    constructor(guidGenerator: IGuidGenerator, util: Utility) {
         this.guidGenerator = guidGenerator;
+        this.util = util;
     }
 
     Count(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): Map<string, number> {
@@ -20,12 +23,7 @@ class GuidResolver implements IParsingStrategy {
         virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
             guids.Each((guid: string) => {
                 const count = this.CountGuidInVFS(guid, virtualFile);
-
-                if (result.has(guid)) {
-                    result.set(guid, result.get(guid)! + count);
-                } else {
-                    result.set(guid, count);
-                }
+                this.util.Increase(result, guid, count);
             });
         });
 
@@ -36,7 +34,7 @@ class GuidResolver implements IParsingStrategy {
         return VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
                 let tempCount = 0;
-                if (file["content"] != null && file.ignore.guidResolver.content) {
+                if (file.ignore.guidResolver.content) {
                     FileContent.if.String(file.content, (str) => {
                         tempCount += str.toUpperCase().Count(key.toUpperCase());
                     });
@@ -57,7 +55,6 @@ class GuidResolver implements IParsingStrategy {
             VirtualFileSystemInstance.match(virtualFile, {
                 File: (file: FileSystemInstance) => {
                     if (!file.ignore.guidResolver.content) return;
-                    if (file["content"] == null) return;
                     FileContent.if.String(file.content, (str: string) => {
                         guidsMap
                             .Each((k: string, v: string) => {
