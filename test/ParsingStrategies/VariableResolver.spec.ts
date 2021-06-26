@@ -1,6 +1,7 @@
 import { should } from 'chai';
 import {
     CyanSafe,
+    CyanVariable,
     FileContent,
     IFileSystemInstanceMetadata,
     Ignore,
@@ -17,7 +18,7 @@ core.ExtendPrimitives();
 
 const utility: Utility = new Utility(core);
 const variableResolver: VariableResolver = new VariableResolver(utility);
-const variables: object = {
+const variables: CyanVariable = {
     a: "Roses",
     b: {
         c: "Violets",

@@ -2,11 +2,14 @@ import { of, Union } from "ts-union";
 
 type Syntax = [string,string] // [open, close] , [ ["~", "~"] , ["{{"], ["}}"]]
 
+type CyanFlag = { [s:string] : boolean | CyanFlag }
+type  CyanVariable = { [s:string] : string | CyanVariable }
+
 interface CyanObject {
     globs: Glob[] | Glob;
     copyOnly: Glob[] | Glob; // Doesn't go through parser
-    variable: object; // { a: "Roses", b: { c: "Violets", d: "please" } }
-    flags: object; // { remove: { one: true, two: false } }
+    variable: CyanVariable; // { a: "Roses", b: { c: "Violets", d: "please" } }
+    flags: CyanFlag; // { remove: { one: true, two: false } }
     guid: string[] | string; // ["asdf-asdf-asdf-asdf", "1234'1234'1234"]
     syntax: Syntax[] | Syntax;
     plugins: { [s: string]: string[] }; // {"api.cyanprint.dev": ["npm, c#", "github"]}
@@ -18,8 +21,8 @@ interface CyanObject {
 interface CyanSafe {
     globs: Glob[];
     copyOnly: Glob[];
-    variable: object;
-    flags: object;
+    variable: CyanVariable;
+    flags: CyanFlag;
     guid: string[];
     syntax: Syntax[];
     plugins: { [s: string]: string[] };
@@ -113,6 +116,8 @@ interface IParsingStrategy {
 export {
     Glob,
     Syntax,
+    CyanFlag,
+    CyanVariable,
     CyanObject,
     CyanSafe,
     ICyanParser,

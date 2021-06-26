@@ -1,5 +1,6 @@
 import {
     CyanSafe,
+    DirectorySystemInstance,
     FileContent,
     FileSystemInstance,
     IGuidGenerator,
@@ -33,13 +34,17 @@ class GuidResolver implements IParsingStrategy {
     private CountGuidInVFS(key: string, virtualFile: VirtualFileSystemInstance): number {
         return VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
-                let tempCount = 0;
+                let tempCount = file.ignore.guidResolver.metadata ? file.metadata.sourceAbsolutePath.toUpperCase().Count(key.toUpperCase()) : 0;
                 if (file.ignore.guidResolver.content) {
                     FileContent.if.String(file.content, (str) => {
                         tempCount += str.toUpperCase().Count(key.toUpperCase());
                     });
                 }
                 return tempCount;
+            },
+            Folder: (folder: DirectorySystemInstance) => {
+                return folder.ignore.guidResolver.metadata ? 
+                    folder.metadata.sourceAbsolutePath.toUpperCase().Count(key.toUpperCase()) : 0;
             },
             default: () => 0,
         });
@@ -51,20 +56,23 @@ class GuidResolver implements IParsingStrategy {
 
     ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
         const guidsMap: Map<string, string> = cyan.guid.AsKey(() => this.guidGenerator.GenerateGuid());
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            VirtualFileSystemInstance.match(virtualFile, {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
+            return VirtualFileSystemInstance.match(copyVirtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.ignore.guidResolver.content) return;
+                    if (!file.ignore.guidResolver.content) return copyVirtualFile;
                     FileContent.if.String(file.content, (str: string) => {
+                        let content = str;
                         guidsMap
-                            .Each((k: string, v: string) => {
-                                str = str.ReplaceAll(k.toLowerCase(), v).ReplaceAll(k.toUpperCase(), v);
+                            .Map((k: string, v: string) => {
+                                content = content.ReplaceAll(k.toLowerCase(), v).ReplaceAll(k.toUpperCase(), v);
                             });
-                        file.content = FileContent.String(str);
+                        file.content = FileContent.String(content);
                     });
+                    return copyVirtualFile;
                 },
-                default: () => {
-                    return;
+                default: (_virtualFile) => {
+                    return _virtualFile;
                 }
             });
         });
@@ -73,14 +81,16 @@ class GuidResolver implements IParsingStrategy {
     ReplaceGuid(guidArr: Map<string, string>, virtualFile: VirtualFileSystemInstance) {
         let upper: Map<string, string> = guidArr.MapKey((s: string) => s.toUpperCase());
         let lower: Map<string, string> = guidArr.MapKey((s: String) => s.toLowerCase());
-        return VirtualFileSystemInstance.match(virtualFile, {
+        let copyVirtualFile = Object.assign({}, virtualFile);
+        return VirtualFileSystemInstance.match(copyVirtualFile, {
             File: (file: FileSystemInstance) => {
                 if (!file.ignore.guidResolver.content) return;
-                if (file["content"] == null) return;
+                
                 FileContent.if.String(file.content, (str: string) => {
-                    upper.Each((k: string, v: string) => str = str.ReplaceAll(k, v));
-                    lower.Each((k: string, v: string) => str = str.ReplaceAll(k, v));
-                    file.content = FileContent.String(str);
+                    let content = str;
+                    upper.Map((k: string, v: string) => content = content.ReplaceAll(k, v));
+                    lower.Map((k: string, v: string) => content = content.ReplaceAll(k, v));
+                    file.content = FileContent.String(content);
                 });
             },
             default: () => {

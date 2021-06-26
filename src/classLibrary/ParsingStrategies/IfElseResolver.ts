@@ -20,10 +20,10 @@ class IfElseResolver implements IParsingStrategy {
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            flags.Each((flag: string) => {
+        virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            flags.Map((flag: string) => {
                 const allPossibleIfs = this.ModifyIfWithAllSyntax(flag, syntaxes).concat(this.ModifyInverseIfWithAllSyntax(flag, syntaxes));
-                allPossibleIfs.Each((key: string) => {
+                allPossibleIfs.Map((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile)
 									.AtMax(this.CountKeyInVFS(this.ConvertIfToEndKeyword(key), virtualFile));
                     this.util.Increase(result, flag, count);
@@ -71,27 +71,29 @@ class IfElseResolver implements IParsingStrategy {
 		const flagsMap: Map<string, boolean> = this.util.FlattenBooleanValueObject(cyan.flags);
 		const allPossibleIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyIfWithAllSyntax(key, cyan.syntax));
 		const allPossibleInverseIfSignaturesMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseIfWithAllSyntax(key, cyan.syntax));
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            VirtualFileSystemInstance.match(virtualFile, {
+		return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+			let copyVirtualFile = Object.assign({}, virtualFile);
+            return VirtualFileSystemInstance.match(copyVirtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.ignore.ifElseResolver.content) return;
+                    if (!file.ignore.ifElseResolver.content) return copyVirtualFile;
 					
                     FileContent.if.String(file.content, (strContent: string) => {
-                        allPossibleIfSignaturesMap.Each((ifSignatures: string[], v: boolean) => {
-							strContent = this.ResolveContentBetweenIfSignature(ifSignatures, v, strContent, false);
+						let resolvedContent = strContent;
+                        allPossibleIfSignaturesMap.Map((ifSignatures: string[], v: boolean) => {
+							resolvedContent = this.ResolveContentBetweenIfSignature(ifSignatures, v, resolvedContent, false);
 						});
-						allPossibleInverseIfSignaturesMap.Each((invIfSignatures: string[], v: boolean) => {
-							strContent = this.ResolveContentBetweenIfSignature(invIfSignatures, v, strContent, true);
+						allPossibleInverseIfSignaturesMap.Map((invIfSignatures: string[], v: boolean) => {
+							resolvedContent = this.ResolveContentBetweenIfSignature(invIfSignatures, v, resolvedContent, true);
 						});
-						file.content = FileContent.String(strContent);
+						file.content = FileContent.String(resolvedContent);
                     });
+					return copyVirtualFile;
                 },
-                default: () => {
-                    return;
+                default: (_virtualFile) => {
+                    return _virtualFile;
                 }
             });
         });
-		
 	};
 
 	ResolveContentBetweenIfSignature(ifSignatures: string[], v: boolean, strContent: string, isInverse: boolean) : string

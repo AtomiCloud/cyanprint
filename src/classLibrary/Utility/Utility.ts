@@ -49,7 +49,7 @@ export class Utility {
                 } else if (typeof data === "object") {
                     ret = new Map<string, any>(ret.Arr().Union(this.FlattenBooleanValueObject(data, prepend + k + '.').Arr(), true));
                 } else {
-                    Utility.Throw('Type', 'Every field cannot be empty: fields ' + k, obj);
+                    Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                 }
             }
         }
@@ -66,10 +66,10 @@ export class Utility {
                     if (c.IsNumber(data)) {
                         ret.set(prepend + k, data);
                     } else {
-                        Utility.Throw('Type', 'Every field cannot be empty: fieldsss ' + k, obj);
+                        Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                     }
                 } else {
-                    Utility.Throw('Type', 'Every field cannot be empty: fields ' + k, obj);
+                    Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                 }
             }
         }

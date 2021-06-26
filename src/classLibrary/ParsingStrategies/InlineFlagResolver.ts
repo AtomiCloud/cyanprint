@@ -21,10 +21,10 @@ class InlineFlagResolver implements IParsingStrategy {
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            flags.Each((flag: string) => {
+        virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            flags.Map((flag: string) => {
                 const allPossibleIfs = this.ModifyFlagWithAllSyntax(flag, syntaxes).concat(this.ModifyInverseFlagWithAllSyntax(flag, syntaxes));
-                allPossibleIfs.Each((key: string) => {
+                allPossibleIfs.Map((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile);
                     this.util.Increase(result, flag, count);
                 });
@@ -76,11 +76,13 @@ class InlineFlagResolver implements IParsingStrategy {
                     shouldStay = shouldStay && this.ShouldKeepFileWithInlineFlag(flagWithAllSyntaxes, !flagVal, virtualFile);
                 })
             return shouldStay;
-        }).Each((virtualFile: VirtualFileSystemInstance) => {
+        }).Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
             allPossibleFlagsMap.Keys().concat(allPossibleInverseFlagsMap.Keys())
                 .forEach((key: string[]) => {
-                    this.RemoveFlagFromMetadataDestinationPath(key, virtualFile)
+                    this.RemoveFlagFromMetadataDestinationPath(key, copyVirtualFile)
                 });    
+            return copyVirtualFile;
         });
 	};
 
@@ -118,35 +120,39 @@ class InlineFlagResolver implements IParsingStrategy {
         const allPossibleFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyFlagWithAllSyntax(key, cyan.syntax));
         const allPossibleInverseFlagsMap: Map<string[], boolean> = flagsMap.MapKey((key: string) => this.ModifyInverseFlagWithAllSyntax(key, cyan.syntax));
 
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            VirtualFileSystemInstance.match(virtualFile, {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
+            return VirtualFileSystemInstance.match(copyVirtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.ignore.inlineResolver.content) return;
+                    if (!file.ignore.inlineResolver.content) return copyVirtualFile;
                     FileContent.if.String(file.content, (str: string) => {
-                        str = this.ConstructContentForInlineFlags(str, allPossibleFlagsMap, cyan.comments, false);
-                        str = this.ConstructContentForInlineFlags(str, allPossibleInverseFlagsMap, cyan.comments, true);
-                        file.content = FileContent.String(str);
+                        let content = str;
+                        content = this.ConstructContentForInlineFlags(content, allPossibleFlagsMap, cyan.comments, false);
+                        content = this.ConstructContentForInlineFlags(content, allPossibleInverseFlagsMap, cyan.comments, true);
+                        file.content = FileContent.String(content);
                     });
+                    return copyVirtualFile;
                 },
-                default: () => {
-                    return;
+                default: (_virtualFile) => {
+                    return _virtualFile;
                 }
             });
         });
 	};
 
     ConstructContentForInlineFlags(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[], isInverse: boolean): string {
+        let constructedContent = content;
         allPossibleSignatureMap
-            .Each((allSignatures: string[], val: boolean) => {
+            .Map((allSignatures: string[], val: boolean) => {
                 if (isInverse) val = !val;
-                content = content
+                constructedContent = constructedContent
                     .LineBreak()
                     .Where((s: string) => this.ShouldKeepStringWithInlineFlag(allSignatures, val, s))
                     .Map((s: string) => s.Without(this.GenerateCommentsWithSignatureStrings(allSignatures, comments))) //why should it care about comments?
                     .Map((s: string) => s.Without(allSignatures))
                     .join("\n");
             });
-        return content;
+        return constructedContent;
     }
 
     GenerateCommentsWithSignatureStrings(signatures: string[], comments: string[]): string[] {

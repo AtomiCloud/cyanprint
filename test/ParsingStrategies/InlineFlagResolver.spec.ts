@@ -1,5 +1,6 @@
 import { should } from 'chai';
 import {
+    CyanFlag,
     CyanSafe,
     FileContent,
     IFileSystemInstanceMetadata,
@@ -17,7 +18,7 @@ core.ExtendPrimitives();
 
 const utility: Utility = new Utility(core);
 const inlineFlagResolver: InlineFlagResolver = new InlineFlagResolver(utility);
-const flags: object = {
+const flags: CyanFlag = {
     a: true,
     b: {
         c: true,

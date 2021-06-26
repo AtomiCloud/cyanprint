@@ -133,8 +133,8 @@ describe("GuidResolver", () => {
             let testSubject = [file1, file2, file3];
 
             let expected: [string, number][] = ([
-                ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", 2],
-                ["bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1", 2]
+                ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", 3],
+                ["bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1", 4]
             ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
 
             let actual: [string, number][] = guidResolver.Count(testCyanSafe, testSubject)
@@ -228,7 +228,7 @@ describe("GuidResolver", () => {
             let testSubject = [file1, file2, file3, file4, folder1, folder2];
 
             let expected: [string, number][] = ([
-                ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", 2],
+                ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", 5],
                 ["bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1", 2]
             ] as [string, number][]).Sort(SortType.AtoZ, (t: [string, number]) => t[0]);
 

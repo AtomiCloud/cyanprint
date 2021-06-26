@@ -21,10 +21,10 @@ class VariableResolver implements IParsingStrategy {
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            variables.Each((variable: string) => {
+        virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            variables.Map((variable: string) => {
                 const allPossibleVariables = this.ModifyVariablesWithAllSyntax(variable, syntaxes);
-                allPossibleVariables.Each((key: string) => {
+                allPossibleVariables.Map((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile);
                     this.util.Increase(result, variable, count);
                 });
@@ -55,12 +55,13 @@ class VariableResolver implements IParsingStrategy {
     ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
         const variables: Map<string, string> = this.util.FlattenStringValueObject(cyan.variable);
 
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
             variables
                 .MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax))
-                .Each((allSyntaxes: string[], val: string) => {
+                .Map((allSyntaxes: string[], val: string) => {
                     allSyntaxes.Map((syntax: string) => {
-                        VirtualFileSystemInstance.match(virtualFile, {
+                        VirtualFileSystemInstance.match(copyVirtualFile, {
                             File: (file: FileSystemInstance) => {
                                 file.metadata.destinationAbsolutePath =
                                     file.ignore.variableResolver.metadata
@@ -75,8 +76,10 @@ class VariableResolver implements IParsingStrategy {
                                         : folder.metadata.destinationAbsolutePath;
                             }
                         });
+                        return copyVirtualFile;
                     });
                 });
+                return copyVirtualFile;
         });
     }
 
@@ -84,22 +87,25 @@ class VariableResolver implements IParsingStrategy {
         const variablesMap: Map<string, string> = this.util.FlattenStringValueObject(cyan.variable);
         const allPossibleVariablesMap: Map<string[], string> = variablesMap.MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax));
 
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            VirtualFileSystemInstance.match(virtualFile, {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
+            return VirtualFileSystemInstance.match(copyVirtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.ignore.variableResolver.content) return;
+                    if (!file.ignore.variableResolver.content) return virtualFile;
                     FileContent.if.String(file.content, (str: string) => {
+                        let content = str;
                         allPossibleVariablesMap
-                            .Each((allSyntaxes: string[], val: string) => {
+                            .Map((allSyntaxes: string[], val: string) => {
                                 allSyntaxes.Map((syntax: string) => {
-                                    str = str.ReplaceAll(syntax, val);
+                                    content = content.ReplaceAll(syntax, val);
                                 });
                             });
-                        file.content = FileContent.String(str);
+                        file.content = FileContent.String(content);
                     });
+                    return virtualFile;
                 },
-                default: () => {
-                    return;
+                default: (_virtualFile) => {
+                    return _virtualFile;
                 }
             });
         });
