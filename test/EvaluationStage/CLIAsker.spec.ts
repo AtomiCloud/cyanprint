@@ -3,7 +3,7 @@ import inquirer from "inquirer";
 import sinon, { SinonSandbox } from "sinon";
 import { should } from "chai";
 import { Core, Kore } from "@kirinnee/core";
-import { ListInputs } from "../../src/classLibrary/interfaces/interfaces";
+import { InputsAsListType } from "../../src/classLibrary/interfaces/interfaces";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 
 should();
@@ -65,7 +65,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: "Amazon Web Service"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: "Google Cloud Platform",
@@ -85,7 +85,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: "Amazon Web Service"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: {
@@ -109,7 +109,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: "GCP Compute Engine"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: {
@@ -143,7 +143,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: ["Amazon Web Service", "Google Cloud Platform"]};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: "Google Cloud Platform",
@@ -163,7 +163,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: ["Amazon Web Service", "GCP Compute Engine", "Digital Ocean Spaces"]};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: {
@@ -187,7 +187,7 @@ describe("CLIAsker", () => {
             const stubReply = {selected: ["GCP Compute Engine", "GCP Cloud Storage", "Azure Blob Storage"]};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
 
-            const options: ListInputs = {
+            const options: InputsAsListType = {
                 aws: "Amazon Web Service",
                 azure: "Azure Blob Storage",
                 gcp: {
