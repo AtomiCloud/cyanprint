@@ -147,8 +147,12 @@ interface IParsingStrategy {
 // ╚══════╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 //
 
-interface ListInputs {
-    [flag: string]: any; // Can be object or string
+interface InputsAsListType {
+    [flag: string]: string | InputsAsListType; // Can be object or string
+}
+
+interface InputAsTextInputType {
+    [flag: string]: [string, string];
 }
 
 interface IAsker {
@@ -156,13 +160,13 @@ interface IAsker {
     AskPredicate(question: string, yesOption: string, noOption: string): Promise<Boolean>;
 
     // Ask for user input and return a Map of variable to user's answer.
-    AskForInput(): Promise<object>;
+    AskForInput(options: InputAsTextInputType): Promise<object>;
 
     // Ask user in form of checkbox, checked keys will have True values, the rest will have False values.
-    AskAsCheckbox(options: ListInputs, question: string): Promise<{ [s: string]: boolean }>;
+    AskAsCheckbox(options: InputsAsListType, question: string): Promise<{ [s: string]: boolean }>;
 
     // Multiple options, only one answer. Chosen option will have True value, the rest will have False values.
-    AskAsList(options: ListInputs, question: string): Promise<{ [s: string]: boolean }>;
+    AskAsList(options: InputsAsListType, question: string): Promise<{ [s: string]: boolean }>;
 }
 
 interface IEvaluator {
@@ -187,7 +191,8 @@ export {
     DirectorySystemInstance,
     VirtualFileSystemInstance,
     Ignore,
-    ListInputs,
+    InputsAsListType,
+    InputAsTextInputType,
     IAsker,
     IEvaluator
 };

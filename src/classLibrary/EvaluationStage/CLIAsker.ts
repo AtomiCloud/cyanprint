@@ -1,5 +1,5 @@
-import { IAsker, ListInputs } from "../interfaces/interfaces";
-import inquirer, { Answers, Questions } from "inquirer";
+import { IAsker, InputAsTextInputType, InputsAsListType } from "../interfaces/interfaces";
+import inquirer, { Answers, Question, Questions } from "inquirer";
 import { Utility } from "../Utility/Utility";
 
 class CLIAsker implements IAsker {
@@ -9,9 +9,9 @@ class CLIAsker implements IAsker {
         this.util = util;
     }
 
-    async AskAsCheckbox(options: ListInputs, question: string): Promise<{ [s: string]: boolean }> {
+    async AskAsCheckbox(options: InputsAsListType, question: string): Promise<{ [s: string]: boolean }> {
         const mappedOptions: Map<string, string> = this.util.FlattenObject(options);
-        const questionObject: Questions = {
+        const questionObject: Question = {
             type: "checkbox",
             name: "selected",
             message: question,
@@ -25,9 +25,9 @@ class CLIAsker implements IAsker {
         return Promise.resolve(Object.fromEntries(flagsMap));
     }
 
-    async AskAsList(options: ListInputs, question: string): Promise<{ [s: string]: boolean }> {
+    async AskAsList(options: InputsAsListType, question: string): Promise<{ [s: string]: boolean }> {
         const mappedOptions: Map<string, string> = this.util.FlattenObject(options);
-        const questionObject: Questions = {
+        const questionObject: Question = {
             type: "list",
             name: "selected",
             message: question,
@@ -46,7 +46,7 @@ class CLIAsker implements IAsker {
     }
 
     async AskPredicate(question: string, yesOption: string = "Yes", noOption: string = "No"): Promise<Boolean> {
-        const questionObject: Questions = {
+        const questionObject: Question = {
             type: "list",
             choices: [yesOption, noOption],
             name: "predicate",
@@ -56,6 +56,15 @@ class CLIAsker implements IAsker {
             questionObject
         ]);
         return answer["predicate"] === yesOption;
+    }
+
+    private MakeInputQuestion(flag: string, questionWithDefaultValue: [string, string]): Question {
+        return {
+            type: "input",
+            message: questionWithDefaultValue[1],
+            name: flag,
+            default: questionWithDefaultValue[0]
+        };
     }
 
 }
