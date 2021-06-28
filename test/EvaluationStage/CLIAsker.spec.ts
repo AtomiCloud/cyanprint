@@ -3,7 +3,7 @@ import inquirer from "inquirer";
 import sinon, { SinonSandbox } from "sinon";
 import { should } from "chai";
 import { Core, Kore } from "@kirinnee/core";
-import { InputsAsListType } from "../../src/classLibrary/interfaces/interfaces";
+import { InputAsTextInputType, InputsAsListType } from "../../src/classLibrary/interfaces/interfaces";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 
 should();
@@ -203,6 +203,49 @@ describe("CLIAsker", () => {
                 "gcp.compute": true,
                 "gcp.storage": true,
                 "do": false
+            }
+            answer.should.deep.equal(expected);
+        });
+    });
+
+    describe("AskForInput", () => {
+        let sandbox: SinonSandbox;
+        before(() => {
+            sandbox = sinon.createSandbox();
+        });
+        afterEach(() => {
+            sandbox.restore()
+        });
+
+        it("should return the right answer from user", async () => {
+            const stubReply = {deploy: "Very fancy and secret bucket name"};
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const options: InputAsTextInputType = {
+                deploy: ["Random Default Bucket name", "Enter the bucket name"]
+            };
+            const answer = await cliAsker.AskForInput(options);
+            const expected = {
+                deploy: "Very fancy and secret bucket name"
+            }
+            answer.should.deep.equal(expected);
+        });
+
+        it("should return the right answers if there are multiple questions", async () => {
+            const stubReply = {
+                deploy: "Very fancy and secret bucket name",
+                aws_region: "ap-southeast-1"
+            };
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const options: InputAsTextInputType = {
+                deploy: ["Random Default Bucket name", "Enter the bucket name:"],
+                aws_region: ["ap-southeast-1", "Which AWS region do you use?"]
+            };
+            const answer = await cliAsker.AskForInput(options);
+            const expected = {
+                deploy: "Very fancy and secret bucket name",
+                aws_region: "ap-southeast-1"
             }
             answer.should.deep.equal(expected);
         });

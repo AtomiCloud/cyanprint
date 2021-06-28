@@ -41,8 +41,13 @@ class CLIAsker implements IAsker {
         return Promise.resolve(Object.fromEntries(flagsMap));
     }
 
-    AskForInput(): Promise<object> {
-        return Promise.resolve({});
+    async AskForInput(options: InputAsTextInputType): Promise<object> {
+        const mappedOptions: Map<string, [string, string]> = new Map(Object.entries(options));
+        const questionObjects: Questions = mappedOptions
+            .Map((flag: string, questionWithDefaultValue: [string, string]) => this.MakeInputQuestion(flag, questionWithDefaultValue))
+        const answer: Answers = await inquirer.prompt(questionObjects);
+        const flagsMap: Map<string, string> = mappedOptions.MapValue((options, flag) => answer[flag]);
+        return Promise.resolve(Object.fromEntries(flagsMap));
     }
 
     async AskPredicate(question: string, yesOption: string = "Yes", noOption: string = "No"): Promise<Boolean> {
