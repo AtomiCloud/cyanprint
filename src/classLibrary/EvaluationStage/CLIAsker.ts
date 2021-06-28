@@ -9,7 +9,7 @@ class CLIAsker implements IAsker {
         this.util = util;
     }
 
-    async AskAsCheckbox(options: ListInputs, question: string): Promise<object> {
+    async AskAsCheckbox(options: ListInputs, question: string): Promise<{ [s: string]: boolean }> {
         const mappedOptions: Map<string, string> = this.util.FlattenObject(options);
         const questionObject: Questions = {
             type: "checkbox",
@@ -25,7 +25,7 @@ class CLIAsker implements IAsker {
         return Promise.resolve(Object.fromEntries(flagsMap));
     }
 
-    async AskAsList(options: ListInputs, question: string): Promise<object> {
+    async AskAsList(options: ListInputs, question: string): Promise<{ [s: string]: boolean }> {
         const mappedOptions: Map<string, string> = this.util.FlattenObject(options);
         const questionObject: Questions = {
             type: "list",
