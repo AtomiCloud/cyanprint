@@ -135,12 +135,11 @@ class IfElseResolver implements IParsingStrategy {
 		return strContent.LineBreak().WithoutIndex(lineIndexes).join('\n');
 	}
 	
-	//Untested
 	ModifyIfRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
 	{
 		const allPossibleIfs: string[] = [];
 		syntaxes.Each(syntax => {
-			allPossibleIfs.push(`/if${syntax[0]}[^~]*${syntax[1]}/g`);
+			allPossibleIfs.push(`if${syntax[0]}[^~]*${syntax[1]}`);
 		})
 		return allPossibleIfs;
 	}
@@ -149,7 +148,7 @@ class IfElseResolver implements IParsingStrategy {
 	{
 		const allPossibleIfs: string[] = [];
 		syntaxes.Each(syntax => {
-			allPossibleIfs.push(`/if!${syntax[0]}[^~]*${syntax[1]}/g`);
+			allPossibleIfs.push(`if!${syntax[0]}[^~]*${syntax[1]}`);
 		})
 		return allPossibleIfs;
 	}
@@ -158,10 +157,10 @@ class IfElseResolver implements IParsingStrategy {
 	{
 		const syntaxes: Syntax[] = cyan.syntax;
 		let result: string[] = [];
-		virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
+		virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
 			const allPossibleIfRegExps: string[] = this.ModifyIfRegExpWithAllSyntax(syntaxes).concat(this.ModifyInverseIfRegExpWithAllSyntax(syntaxes));
-			allPossibleIfRegExps.Each((regExpString: string) => {
-				result = result.concat(this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+			allPossibleIfRegExps.Map((regExpString: string) => {
+				result.push(...this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
 			});	
 		});
 		return result;
@@ -171,21 +170,25 @@ class IfElseResolver implements IParsingStrategy {
 	{
 		return VirtualFileSystemInstance.match(virtualFile, {
 			File: (file: FileSystemInstance) => {
+				let res: string[] = [];
 				if (!file.ignore.ifElseResolver.content) return [];
-
 				FileContent.if.String(file.content, (strContent: string) => {
-					return strContent
+					let resolvedContent = strContent;
+					return resolvedContent
 						.LineBreak()
 						.Map(s => {
-							let ifRegExp = new RegExp(key);
-							let endRegExp = new RegExp(this.ConvertIfToEndKeyword(key));
-							s.Match(ifRegExp).concat(s.Match(endRegExp))
+							let ifRegExp = new RegExp(key, "g");
+							let endRegExp = new RegExp(this.ConvertIfToEndKeyword(key), "g");
+							return s.Match(ifRegExp).concat(s.Match(endRegExp));
 						})
 						.Flatten()
-						.Map(s => `${s}:${file.metadata.relativePath}`)
+						.Map(s => {
+							res.push(`${s}:${file.metadata.relativePath}`);
+							return res;
+						})
 						.Flatten();
 				});
-				return [];
+				return res;
 			},
 			default: () => { 
 				return [];

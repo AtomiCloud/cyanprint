@@ -32,7 +32,7 @@ export class Utility {
                 } else if (typeof data === "object") {
                     ret = new Map<string, string>(ret.Arr().Union(this.FlattenStringValueObject(data, prepend + k + '.').Arr(), true));
                 } else {
-                    Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
+                    Utility.Throw('Type', 'Every field cannot be empty or is not an object/string value: field ' + k, obj);
                 }
             }
         }
@@ -49,7 +49,7 @@ export class Utility {
                 } else if (typeof data === "object") {
                     ret = new Map<string, any>(ret.Arr().Union(this.FlattenBooleanValueObject(data, prepend + k + '.').Arr(), true));
                 } else {
-                    Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
+                    Utility.Throw('Type', 'Every field cannot be empty or is not an object/boolean value: field ' + k, obj);
                 }
             }
         }
@@ -69,7 +69,7 @@ export class Utility {
                         Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
                     }
                 } else {
-                    Utility.Throw('Type', 'Every field cannot be empty: field ' + k, obj);
+                    Utility.Throw('Type', 'Every field cannot be empty or is not an object/number value: field ' + k, obj);
                 }
             }
         }

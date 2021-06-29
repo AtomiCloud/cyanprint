@@ -1098,5 +1098,58 @@ describe("IfElseResolver", () => {
             ifElseResolver.RemoveLineIndexes(indexes, strContent).should.deep.equal("Roses are red\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nOreos are black!!");
         });
     });
+
+    describe("CountPossibleUnaccountedFlags", () => {
+        it("should count all unaccounted flags", () => {
+
+            let path1: string = "root/if~a~/end~a~";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nif!~~a}}\n are red\nblabla\nnothing\n are blue\nblabla"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nif!##b.d.e}\n help me!\nare black!!"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nif!`{b.d.f}`\n are red\nnothing\nignore this\n are blue"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+            let expected: string[] = [
+                `if!~~a}}:${path1}`,
+                `if!##b.d.e}:${path2}`,
+                `if!\`{b.d.f}\`:${path3}`].Sort(SortType.AtoZ);
+
+            let actual: string[] = ifElseResolver.CountPossibleUnaccountedFlags(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .Sort(SortType.AtoZ);
+
+            actual.should.deep.equal(expected);
+            
+        });
+    });
 });
 
