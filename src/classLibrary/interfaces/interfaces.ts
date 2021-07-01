@@ -111,6 +111,8 @@ interface IParsingStrategy {
     Count(cyan: CyanSafe, files: VirtualFileSystemInstance[]): Map<string, number>;
 
     ResolveFiles(cyan: CyanSafe, files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[];
+
+    CountPossibleUnaccountedFlags(cyan: CyanSafe,files: VirtualFileSystemInstance[]): string[];
 }
 
 export {

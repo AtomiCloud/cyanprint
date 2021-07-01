@@ -1007,4 +1007,58 @@ describe("VariableResolver", () => {
             variableResolver.ModifyVariablesWithAllSyntax("package.name", testCyanSafe.syntax).should.deep.equal(["var~package.name~"]);
         });
     });
+
+    describe("CountPossibleUnaccountedFlags", () => {
+        it("should count all unaccounted variables", () => {
+
+            let path1: string = "root/var##a}/";
+            let fileMeta1: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path1,
+                destinationAbsolutePath: path1,
+                relativePath: path1,
+            }
+            let file1 = VirtualFileSystemInstance.File({
+                metadata: fileMeta1,
+                content: FileContent.String("line1\nvar~~a}}\n are red\nblabla\nnothing\n are blue\nblabla"),
+                ignore: parseAll,
+            });
+
+            let path2: string = "root/";
+            let fileMeta2: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path2,
+                destinationAbsolutePath: path2,
+                relativePath: path2,
+            }
+            let file2 = VirtualFileSystemInstance.File({
+                metadata: fileMeta2,
+                content: FileContent.String("line2\nvar##b.d.e}\n help me!\nare black!!"),
+                ignore: parseAll,
+            });
+
+            let path3: string = "root/";
+            let fileMeta3: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: path3,
+                destinationAbsolutePath: path3,
+                relativePath: path3,
+            }
+            let file3 = VirtualFileSystemInstance.File({
+                metadata: fileMeta3,
+                content: FileContent.String("line2\nvar`{b.d.f}`\n are red\nnothing\nignore this\n are blue"),
+                ignore: parseAll,
+            });
+
+            let testSubject = [file1, file2, file3];
+            let expected: string[] = [
+                `var~~a}}:${path1}`,
+                `var##a}:${path1}`,
+                `var##b.d.e}:${path2}`,
+                `var\`{b.d.f}\`:${path3}`].Sort(SortType.AtoZ);
+
+            let actual: string[] = variableResolver.CountPossibleUnaccountedFlags(testCyanSafeWithMultiCharacterSyntax, testSubject)
+                .Sort(SortType.AtoZ);
+
+            actual.should.deep.equal(expected);
+            
+        });
+    });
 });

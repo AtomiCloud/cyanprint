@@ -98,6 +98,10 @@ class GuidResolver implements IParsingStrategy {
             }
         });
     }
+
+    CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] {
+        return [];
+    }
 }
 
 export { GuidResolver };

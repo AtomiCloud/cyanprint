@@ -140,6 +140,68 @@ class InlineFlagResolver implements IParsingStrategy {
         });
 	};
 
+    ModifyFlagRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleFlags: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleFlags.push(`flag${syntax[0]}[^~]*${syntax[1]}`);
+		})
+		return allPossibleFlags;
+	}
+
+	ModifyInverseFlagRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleFlags: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleFlags.push(`flag!${syntax[0]}[^~]*${syntax[1]}`);
+		})
+		return allPossibleFlags;
+	}
+
+    CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] {
+        const syntaxes: Syntax[] = cyan.syntax;
+		let result: string[] = [];
+		virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+			const allPossibleFlagRegExps: string[] = this.ModifyFlagRegExpWithAllSyntax(syntaxes).concat(this.ModifyInverseFlagRegExpWithAllSyntax(syntaxes));
+			allPossibleFlagRegExps.Map((regExpString: string) => {
+				result.push(...this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+			});	
+		});
+		return result;
+    }
+
+    CountUnaccountedKeyInVFS(key:string, virtualFile: VirtualFileSystemInstance): string[]
+	{
+		return VirtualFileSystemInstance.match(virtualFile, {
+			File: (file: FileSystemInstance) => {
+				let res: string[] = [];
+                let reg = new RegExp(key, "g");
+				if (!file.ignore.inlineResolver.content) return [];
+				FileContent.if.String(file.content, (strContent: string) => {
+					let resolvedContent = strContent;
+					return resolvedContent
+						.LineBreak()
+						.Map(line => {
+							return line.Match(reg);
+						})
+						.Flatten()
+						.Map(s => {
+							res.push(`${s}:${file.metadata.relativePath}`);
+						})
+				});
+                file.metadata.destinationAbsolutePath.Match(reg)
+                    .Map((s: string) => { 
+                        res.push(`${s}:${file.metadata.relativePath}`);
+                    })  
+				return res;
+			},
+			default: () => { 
+				return [];
+			}
+		});
+	}
+
+
     ConstructContentForInlineFlags(content: string, allPossibleSignatureMap: Map<string[], boolean>, comments: string[], isInverse: boolean): string {
         let constructedContent = content;
         allPossibleSignatureMap

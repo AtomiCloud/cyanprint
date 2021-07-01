@@ -1100,7 +1100,7 @@ describe("IfElseResolver", () => {
     });
 
     describe("CountPossibleUnaccountedFlags", () => {
-        it("should count all unaccounted flags", () => {
+        it("should count all unaccounted if lines", () => {
 
             let path1: string = "root/if~a~/end~a~";
             let fileMeta1: IFileSystemInstanceMetadata = {

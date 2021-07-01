@@ -111,6 +111,59 @@ class VariableResolver implements IParsingStrategy {
         });
     }
 
+    //todo test
+    CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] {
+        const syntaxes: Syntax[] = cyan.syntax;
+		let result: string[] = [];
+		virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+			const allPossibleFlagRegExps: string[] = this.ModifyVariableRegExpWithAllSyntax(syntaxes);
+			allPossibleFlagRegExps.Map((regExpString: string) => {
+				result.push(...this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+			});	
+		});
+		return result;
+    }
+
+    CountUnaccountedKeyInVFS(key:string, virtualFile: VirtualFileSystemInstance): string[]
+	{
+		return VirtualFileSystemInstance.match(virtualFile, {
+			File: (file: FileSystemInstance) => {
+				let res: string[] = [];
+                let reg = new RegExp(key, "g");
+				if (!file.ignore.variableResolver.content) return [];
+				FileContent.if.String(file.content, (strContent: string) => {
+					let resolvedContent = strContent;
+					return resolvedContent
+						.LineBreak()
+						.Map(line => {
+							return line.Match(reg);
+                        })
+                        .Flatten()
+                        .Map(s => {
+                            res.push(`${s}:${file.metadata.relativePath}`); 
+                        });
+				});
+                file.metadata.destinationAbsolutePath.Match(reg)
+                    .Map((s: string) => { 
+                        res.push(`${s}:${file.metadata.relativePath}`);
+                    })
+				return res;
+			},
+			default: () => { 
+				return [];
+			}
+		});
+	}
+
+    ModifyVariableRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleVars: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleVars.push(`var${syntax[0]}[^~]*${syntax[1]}`);
+		})
+		return allPossibleVars;
+	}
+
     ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
         return syntaxes.Map( ([start, end]: Syntax) => `var${start + v + end}`);
     }

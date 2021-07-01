@@ -184,9 +184,7 @@ class IfElseResolver implements IParsingStrategy {
 						.Flatten()
 						.Map(s => {
 							res.push(`${s}:${file.metadata.relativePath}`);
-							return res;
 						})
-						.Flatten();
 				});
 				return res;
 			},

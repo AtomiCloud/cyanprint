@@ -83,4 +83,13 @@ export class Utility {
           m.set(key, amount);
         }
     } 
+
+    IncreaseInMap<T>(m: Map<T, number>, n:Map<T, number>) : Map<T, number>
+    {
+        let mCopy = new Map(m);
+        mCopy.forEach((value:number, key: T) => {
+            this.Increase(n, key, value);
+        })
+        return mCopy;
+    }
 }
