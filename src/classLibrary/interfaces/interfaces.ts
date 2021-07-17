@@ -38,7 +38,7 @@ interface CyanSafe {
 }
 
 interface ICyanParser {
-    Parse(p: Partial<CyanObject>): CyanSafe;
+    Parse(cyanObject: Partial<CyanObject>): CyanSafe;
 }
 
 // ██╗   ██╗███████╗███████╗     █████╗ ███╗   ██╗██████╗     ███████╗███████╗
@@ -170,7 +170,7 @@ interface IAsker {
 }
 
 interface IEvaluator {
-
+    Evaluate(templatePath: string, folderName: string, asker: IAsker, previousAnswers: any): Promise<CyanSafe>;
 }
 
 export {
