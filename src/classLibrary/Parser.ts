@@ -18,35 +18,34 @@ class Parser {
 	private readonly strategies: IParsingStrategy[];
 	private readonly settings: CyanSafe;
 	private readonly util: Utility;
-
-
-    constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
+	
+	constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
 		this.strategies = strategies;
 		this.settings = settings;
-        this.util = util;
+		this.util = util;
 		this.flagCounter = util.FlattenBooleanValueObject(settings.flags).MapValue(() => 0);
 		this.variableCounter = util.FlattenStringValueObject(settings.variable).MapValue(() => 0);
 		this.guidCounter = settings.guid.AsKey((() => 0));
 	}
-
-    ParseFiles(files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
+	
+	ParseFiles(files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		for (let i = 0; i < this.strategies.length; i++) {
 			let strategy = this.strategies[i];
 			files = strategy.ResolveFiles(this.settings, files);
 		}
 		return files;
 	}
-
-    private CountFiles(files: VirtualFileSystemInstance[]): void {
+	
+	private CountFiles(files: VirtualFileSystemInstance[]): void {
 		for (let i = 0; i < this.strategies.length; i++) {
 			let strategy = this.strategies[i];
 			switch (typeof(strategy)) {
 				case typeof(InlineFlagResolver):
 					this.flagCounter = this.util.IncreaseInMap(this.flagCounter, strategy.Count(this.settings, files));
 					break;
-                case typeof(IfElseResolver):
-                    this.flagCounter = this.util.IncreaseInMap(this.flagCounter, strategy.Count(this.settings, files));
-                    break;
+				case typeof(IfElseResolver):
+					this.flagCounter = this.util.IncreaseInMap(this.flagCounter, strategy.Count(this.settings, files));
+					break;
 				case typeof(GuidResolver):
 					this.guidCounter = strategy.Count(this.settings, files);
 					break;
@@ -58,8 +57,8 @@ class Parser {
 			}
 		}
 	}
-
-    /**
+	
+	/**
 	 * Counts the occurrences of things that need to be replaced and displays the occurences
 	 * returns true if its all ok
 	 * returns false if there are variables or flags unused
@@ -86,13 +85,13 @@ class Parser {
 		}
 		return true;
 	}
-    
+	
 	/**
 	 * Counts and warns of possible unaccounted flags, variables remaining in the content and metadata
 	 * @param files the files
 	 * @constructor
 	 */
-    CountPossibleRemains(files: VirtualFileSystemInstance[]): void {
+	CountPossibleRemains(files: VirtualFileSystemInstance[]): void {
 		let unaccounted: string[] = this.strategies
 			.Map((s: IParsingStrategy) => s.CountPossibleUnaccountedFlags(this.settings, files))
 			.Flatten();
@@ -116,7 +115,6 @@ class Parser {
 		let bar: Bar = new Bar({}, Presets.shades_grey);
 		let counter: number = 0;
 		bar.start(this.strategies.length, 0);
-		
 		for (let i = 0; i < this.strategies.length; i++) {
 			let strategy = this.strategies[i];
 			files = strategy.ResolveContents(this.settings, files);
@@ -128,8 +126,7 @@ class Parser {
 		return files;
 	}
 	
-
-    DisplayOccurrences(type: string, map: Map<string, number>): string[] {
+	DisplayOccurrences(type: string, map: Map<string, number>): string[] {
 		let ret: string[] = [];
 		if (map.size > 0) {
 			console.log(chalk.cyanBright(`======================================\n  Number of occurrences of ${type}:\n======================================`));
@@ -151,5 +148,4 @@ class Parser {
 			variables.Map((s: string) => console.log("\t" + chalk.red(s)));
 		}
 	}
-	
 }
