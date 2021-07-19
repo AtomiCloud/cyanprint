@@ -8,16 +8,16 @@ import { IfElseResolver } from "./ParsingStrategies/IfElseResolver";
 import { InlineFlagResolver } from "./ParsingStrategies/InlineFlagResolver";
 import { VariableResolver } from "./ParsingStrategies/VariableResolver";
 import { Utility } from "./Utility/Utility";
-import {Bar, Presets} from "cli-progress";
+import { Bar, Presets } from "cli-progress";
 
 //taken from kirinnee/CyanPrint (to be edited later if needed)
 class Parser {
-    private flagCounter: Map<string, number>;
+	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
 	private readonly strategies: IParsingStrategy[];
 	private readonly settings: CyanSafe;
-    private readonly util: Utility;
+	private readonly util: Utility;
 
 
     constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
@@ -60,14 +60,13 @@ class Parser {
 	}
 
     /**
-	 * Counts the occurrences of things that need to be replaced
+	 * Counts the occurrences of things that need to be replaced and displays the occurences
 	 * returns true if its all ok
 	 * returns false if there are variables or flags unused
 	 * @param files the files
 	 * @constructor
 	 */
 	CountOccurence(files: VirtualFileSystemInstance[]): boolean {
-		
 		//Count occurrences and add to counting map
 		this.CountFiles(files);
 		//remove cyan.docs occurrences
@@ -80,15 +79,19 @@ class Parser {
 		let guidZeroes: string[] = this.DisplayOccurrences("Guid", this.guidCounter);
 		if (flagZeroes.length > 0 || varZeroes.length > 0 || guidZeroes.length > 0) {
 			console.log(chalk.yellowBright(`===========\n WARNING\n===========`));
-			this.Warn("flags", flagZeroes);
-			this.Warn("variables", varZeroes);
-			this.Warn("Guid", guidZeroes);
+			this.WarnOfZeroOccurence("flags", flagZeroes);
+			this.WarnOfZeroOccurence("variables", varZeroes);
+			this.WarnOfZeroOccurence("Guid", guidZeroes);
 			return false;
 		}
 		return true;
 	}
-
     
+	/**
+	 * Counts and warns of possible unaccounted flags, variables remaining in the content and metadata
+	 * @param files the files
+	 * @constructor
+	 */
     CountPossibleRemains(files: VirtualFileSystemInstance[]): void {
 		let unaccounted: string[] = this.strategies
 			.Map((s: IParsingStrategy) => s.CountPossibleUnaccountedFlags(this.settings, files))
@@ -99,6 +102,12 @@ class Parser {
 		}
 	}
 	
+	/**
+	 * Resolves the content in the files 
+	 * returns the files
+	 * @param files the files
+	 * @constructor
+	 */
 	ParseContent(files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
 		//Announce start of parsing
 		console.log(chalk.cyanBright("Parsing templates..."));
@@ -136,7 +145,7 @@ class Parser {
 		return ret;
 	}
 	
-	Warn(type: string, variables: string[]) {
+	WarnOfZeroOccurence(type: string, variables: string[]) {
 		if (variables.length > 0) {
 			console.log(chalk.redBright(`[Warning] The following ${type} do not exist in the template`));
 			variables.Map((s: string) => console.log("\t" + chalk.red(s)));

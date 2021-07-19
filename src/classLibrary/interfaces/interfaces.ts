@@ -1,7 +1,6 @@
 import { of, Union } from "ts-union";
 
 type Syntax = [string,string] // [open, close] , [ ["~", "~"] , ["{{"], ["}}"]]
-
 type CyanFlag = { [s:string] : boolean | CyanFlag }
 type  CyanVariable = { [s:string] : string | CyanVariable }
 
