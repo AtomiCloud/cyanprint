@@ -17,21 +17,16 @@ class VariableResolver implements IParsingStrategy {
     }
 
     Count(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): Map<string, number> {
-        const variables: string[] = this.util.FlattenObject(cyan.variable).Keys();
+        const variables: string[] = this.util.FlattenStringValueObject(cyan.variable).Keys();
         const result: Map<string, number> = new Map<string, number>();
         const syntaxes: Syntax[] = cyan.syntax;
 
-        virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            variables.Each((variable: string) => {
+        virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            variables.Map((variable: string) => {
                 const allPossibleVariables = this.ModifyVariablesWithAllSyntax(variable, syntaxes);
-                allPossibleVariables.Each((key: string) => {
+                allPossibleVariables.Map((key: string) => {
                     const count = this.CountKeyInVFS(key, virtualFile);
-
-                    if (result.has(variable)) {
-                        result.set(variable, result.get(variable)! + count);
-                    } else {
-                        result.set(variable, count);
-                    }
+                    this.util.Increase(result, variable, count);
                 });
             });
         });
@@ -43,7 +38,7 @@ class VariableResolver implements IParsingStrategy {
         return VirtualFileSystemInstance.match(virtualFile, {
             File: (file: FileSystemInstance) => {
                 let tempCount = file.ignore.variableResolver.metadata ? file.metadata.destinationAbsolutePath.Count(key) : 0;
-                if (file["content"] != null && file.ignore.variableResolver.content) {
+                if (file.ignore.variableResolver.content) {
                     FileContent.if.String(file.content, (str) => {
                         tempCount += str.Count(key);
                     });
@@ -58,14 +53,15 @@ class VariableResolver implements IParsingStrategy {
     }
 
     ResolveFiles(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
-        const variables: Map<string, string> = this.util.FlattenObject(cyan.variable);
+        const variables: Map<string, string> = this.util.FlattenStringValueObject(cyan.variable);
 
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
             variables
                 .MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax))
-                .Each((allSyntaxes: string[], val: string) => {
+                .Map((allSyntaxes: string[], val: string) => {
                     allSyntaxes.Map((syntax: string) => {
-                        VirtualFileSystemInstance.match(virtualFile, {
+                        VirtualFileSystemInstance.match(copyVirtualFile, {
                             File: (file: FileSystemInstance) => {
                                 file.metadata.destinationAbsolutePath =
                                     file.ignore.variableResolver.metadata
@@ -80,43 +76,96 @@ class VariableResolver implements IParsingStrategy {
                                         : folder.metadata.destinationAbsolutePath;
                             }
                         });
+                        return copyVirtualFile;
                     });
                 });
+                return copyVirtualFile;
         });
     }
 
     ResolveContents(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
-        const variablesMap: Map<string, string> = this.util.FlattenObject(cyan.variable);
+        const variablesMap: Map<string, string> = this.util.FlattenStringValueObject(cyan.variable);
         const allPossibleVariablesMap: Map<string[], string> = variablesMap.MapKey((key: string) => this.ModifyVariablesWithAllSyntax(key, cyan.syntax));
 
-        return virtualFiles.Each((virtualFile: VirtualFileSystemInstance) => {
-            VirtualFileSystemInstance.match(virtualFile, {
+        return virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+            let copyVirtualFile = Object.assign({}, virtualFile);
+            return VirtualFileSystemInstance.match(copyVirtualFile, {
                 File: (file: FileSystemInstance) => {
-                    if (!file.ignore.variableResolver.content) return;
-                    if (file["content"] == null) return;
+                    if (!file.ignore.variableResolver.content) return virtualFile;
                     FileContent.if.String(file.content, (str: string) => {
+                        let content = str;
                         allPossibleVariablesMap
-                            .Each((allSyntaxes: string[], val: string) => {
+                            .Map((allSyntaxes: string[], val: string) => {
                                 allSyntaxes.Map((syntax: string) => {
-                                    str = str.ReplaceAll(syntax, val);
+                                    content = content.ReplaceAll(syntax, val);
                                 });
                             });
-                        file.content = FileContent.String(str);
+                        file.content = FileContent.String(content);
                     });
+                    return virtualFile;
                 },
-                default: () => {
-                    return;
+                default: (_virtualFile) => {
+                    return _virtualFile;
                 }
             });
         });
     }
 
+    //todo test
+    CountPossibleUnaccountedFlags(cyan: CyanSafe, virtualFiles: VirtualFileSystemInstance[]): string[] {
+        const syntaxes: Syntax[] = cyan.syntax;
+		let result: string[] = [];
+		virtualFiles.Map((virtualFile: VirtualFileSystemInstance) => {
+			const allPossibleFlagRegExps: string[] = this.ModifyVariableRegExpWithAllSyntax(syntaxes);
+			allPossibleFlagRegExps.Map((regExpString: string) => {
+				result.push(...this.CountUnaccountedKeyInVFS(regExpString, virtualFile));
+			});	
+		});
+		return result;
+    }
+
+    CountUnaccountedKeyInVFS(key:string, virtualFile: VirtualFileSystemInstance): string[]
+	{
+		return VirtualFileSystemInstance.match(virtualFile, {
+			File: (file: FileSystemInstance) => {
+				let res: string[] = [];
+                let reg = new RegExp(key, "g");
+				if (!file.ignore.variableResolver.content) return [];
+				FileContent.if.String(file.content, (strContent: string) => {
+					let resolvedContent = strContent;
+					return resolvedContent
+						.LineBreak()
+						.Map(line => {
+							return line.Match(reg);
+                        })
+                        .Flatten()
+                        .Map(s => {
+                            res.push(`${s}:${file.metadata.relativePath}`); 
+                        });
+				});
+                file.metadata.destinationAbsolutePath.Match(reg)
+                    .Map((s: string) => { 
+                        res.push(`${s}:${file.metadata.relativePath}`);
+                    })
+				return res;
+			},
+			default: () => { 
+				return [];
+			}
+		});
+	}
+
+    ModifyVariableRegExpWithAllSyntax(syntaxes: Syntax[]): string[]
+	{
+		const allPossibleVars: string[] = [];
+		syntaxes.Each(syntax => {
+			allPossibleVars.push(`var${syntax[0]}[^~]*${syntax[1]}`);
+		})
+		return allPossibleVars;
+	}
+
     ModifyVariablesWithAllSyntax(v: string, syntaxes: Syntax[]): string[] {
-        const allPossibleVariables: string[] = [];
-        syntaxes.Each(syntax => {
-            allPossibleVariables.push(`var${syntax[0] + v + syntax[1]}`);
-        })
-        return allPossibleVariables;
+        return syntaxes.Map( ([start, end]: Syntax) => `var${start + v + end}`);
     }
 }
 
