@@ -29,12 +29,13 @@ export function InstallController(program: CommanderStatic) {
         })
     install.command("group <key>")
         .alias("g")
-        .option("-g , --group-buds <key>", "the group to install to", "main")
+        .option("-g , --group-buds <group-buds>", "the group to install to", "main")
         .description("installs a group and all its templates", {
             key: 'Key of the group to install',
         })
-        .action(async function (key, g) {
-            console.log(key, g);
+        .action(async function (key, group_buds) {
+            console.log(key);
+            console.log(group_buds);
             const result = await axios.get<Post>("http://slowwly.robertomurray.co.uk/delay/2000/url/https://jsonplaceholder.typicode.com/posts/1");
             console.log(chalk.cyan(JSON.stringify(result.data)));
         })
