@@ -90,18 +90,18 @@ interface Ignore {
 
 // TODO may need further review
 interface IGlobFactory {
-    GenerateFiles(glob: Glob, target: string): IFileSystemInstanceMetadata[];
+    GenerateFiles(glob: Glob, target: string): VirtualFileSystemInstance[];
 
     // Callback is used to bump progress
-    ReadFiles(files: IFileSystemInstanceMetadata[], callback?: Function): Promise<FileSystemInstance[]>;
+    ReadFiles(files: IFileSystemInstanceMetadata[], callback?: Function): Promise<VirtualFileSystemInstance[]>;
 }
 
 // TODO may need further review
 interface IFileFactory {
-    CreateFileSystemInstance(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
+    CreateFileSystemInstance(relativePath: string, from?: string, to?: string): VirtualFileSystemInstance;
 
     // Callback is used to bump progress
-    ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<FileSystemInstance>;
+    ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<VirtualFileSystemInstance>;
 }
 
 interface IParsingStrategy {

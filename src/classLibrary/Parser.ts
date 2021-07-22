@@ -11,7 +11,7 @@ import { Utility } from "./Utility/Utility";
 import { Bar, Presets } from "cli-progress";
 
 //taken from kirinnee/CyanPrint (to be edited later if needed)
-class Parser {
+export class Parser {
 	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
@@ -36,7 +36,7 @@ class Parser {
 		return files;
 	}
 	
-	private CountFiles(files: VirtualFileSystemInstance[]): void {
+	CountFiles(files: VirtualFileSystemInstance[]): void {
 		for (let i = 0; i < this.strategies.length; i++) {
 			let strategy = this.strategies[i];
 			switch (typeof(strategy)) {
