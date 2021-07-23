@@ -14,6 +14,7 @@ import path from "path";
 import fs from "fs";
 import { GlobFactory } from "./Utility/GlobFactory";
 import chalk from "chalk";
+import { FileFactory } from "./Utility/FileFactory";
 
 export class Generator {
     private readonly util: Utility;
@@ -24,10 +25,9 @@ export class Generator {
         this.guidGenerator = guidGenerator;
     }
     
-    async Execute(cyanSafe: CyanSafe, relativePath: string, folderName: string, plugins: Plugin[]): VirtualFileSystemInstance[] {
+    async Execute(cyanSafe: CyanSafe, templatePath: string, folderName: string, plugins: Plugin[]): Promise<VirtualFileSystemInstance[]> {
         //dest file path 
         let destPath: string = path.resolve(process.cwd(), folderName);
-        //list of src file path is the relativePath + the glob.root?
 
         //Check if the target path is empty
         if (fs.existsSync(destPath)) {
@@ -48,12 +48,44 @@ export class Generator {
         console.log(chalk.greenBright("Preparation done!"));
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
 
-        //create globs
-        let globFactory: GlobFactory = new GlobFactory();
-        let files: VirtualFileSystemInstance[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFiles(g, g.root)).Flatten();
+        //create globs (empty content vfs)
+        let fileFactory: FileFactory = new FileFactory(templatePath, destPath);
+        let globFactory: GlobFactory = new GlobFactory(this.util, fileFactory);
+        let filesMetadata: IFileSystemInstanceMetadata[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFilesMetadata(g, g.root)).Flatten();
 
+        //remove package.lock + node_modules
+        filesMetadata = filesMetadata.Where(f => !f.sourceAbsolutePath.includes("node_modules"))
+        .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "package-lock.json")
+        .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "yarn.lock");
+
+        let files = fileFactory.ConvertToEmptyFiles(filesMetadata);
+
+        //count for paths
         parser.CountFiles(files);
+
+        //parse to get path according to parsing strategy
+        parser.ParseFiles(files);
+
+        //Read file asynchronously into the VFS (put the content with the metadata into VFS)
+        files = await globFactory.ReadFiles(files);
+
+        //count for the remaining content
+        let isNoUnusedFlags: boolean = parser.CountOccurence(files);
         
+        //if there are unused flags
+        if (!isNoUnusedFlags) {
+
+        }        
+
+        console.log(chalk.cyanBright("Generating template content..."));
+
+        //Parse Templates
+        files = parser.ParseContent(files);
+
+        //Generate warning of possible possible unaccounted flags
+        parser.CountPossibleRemains(files);
+
+        return files;
     }
 }
     

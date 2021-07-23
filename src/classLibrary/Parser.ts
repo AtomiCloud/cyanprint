@@ -1,6 +1,6 @@
 import { IParsingStrategy, 
     VirtualFileSystemInstance,
-    CyanSafe
+    CyanSafe,
 } from "./interfaces/interfaces";
 import chalk from "chalk";
 import { GuidResolver } from "./ParsingStrategies/GuidResolver";
