@@ -2,7 +2,6 @@ import { CyanSafe } from "./interfaces/interfaces";
 import chalk from "chalk";
 import { spawn } from "child_process";
 import path from "path";
-import fs from "fs";
 
 export class PluginHandler {
     async DownloadPlugins(cyanSafe: CyanSafe, folderName: string, templatePath: string) {
@@ -42,12 +41,12 @@ export class PluginHandler {
     }
 
     async DownloadNpm(folderName: string, templatePath: string) {
-        let filePath = path.resolve(templatePath, "package.json");
-        if (!fs.existsSync(filePath)) {
+        let absPath = path.resolve(templatePath, "package.json");
+        if (!absPath.includes("package.json")) {
             console.info(chalk.yellowBright("package.json not found. Installation of NPM modules halted."));
             return;
         }
-        let cd: string = path.relative(filePath, "package.json");
+        let cd: string = path.relative(templatePath, absPath);
         console.log(chalk.cyanBright("Installing NPM modules"));
         let reply = "";
         let hasYarn = await this.ExecuteCommandSimple("yarn", ["-v"], "", true);
