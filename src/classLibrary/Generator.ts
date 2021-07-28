@@ -10,11 +10,13 @@ import { IfElseResolver } from "./ParsingStrategies/IfElseResolver";
 import { InlineFlagResolver } from "./ParsingStrategies/InlineFlagResolver";
 import { VariableResolver } from "./ParsingStrategies/VariableResolver";
 import { Utility } from "./Utility/Utility";
-import path from "path";
 import fs from "fs";
+import path from "path";
 import { GlobFactory } from "./Utility/GlobFactory";
 import chalk from "chalk";
 import { FileFactory } from "./Utility/FileFactory";
+
+import deleteEmpty from "delete-empty";
 
 export class Generator {
     private readonly util: Utility;
@@ -25,17 +27,9 @@ export class Generator {
         this.guidGenerator = guidGenerator;
     }
     
-    async Execute(cyanSafe: CyanSafe, templatePath: string, folderName: string, plugins: Plugin[]): Promise<VirtualFileSystemInstance[]> {
-        //dest file path 
-        let destPath: string = path.resolve(process.cwd(), folderName);
-
-        //Check if the target path is empty
-        if (fs.existsSync(destPath)) {
-            //ask if want to delete existing stuff
-        }
-
-        console.log(chalk.cyanBright("Preparing template, please wait..."));
-
+    async GenerateVFS(cyanSafe: CyanSafe, globFactory: GlobFactory): Promise<VirtualFileSystemInstance[]> {
+    
+        //missing package resolver but need think how to expand it to beyond npm modules
         let strategies: IParsingStrategy[] = [
             new GuidResolver(this.guidGenerator, this.util),
             new IfElseResolver(this.util),
@@ -49,16 +43,15 @@ export class Generator {
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
 
         //create globs (empty content vfs)
-        let fileFactory: FileFactory = new FileFactory(templatePath, destPath);
-        let globFactory: GlobFactory = new GlobFactory(this.util, fileFactory);
         let filesMetadata: IFileSystemInstanceMetadata[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFilesMetadata(g, g.root)).Flatten();
 
-        //remove package.lock + node_modules
+        //remove package.lock
         filesMetadata = filesMetadata.Where(f => !f.sourceAbsolutePath.includes("node_modules"))
         .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "package-lock.json")
         .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "yarn.lock");
 
-        let files = fileFactory.ConvertToEmptyFiles(filesMetadata);
+        //no ignore is put
+        let files = globFactory.CreateEmptyFiles(filesMetadata);
 
         //count for paths
         parser.CountFiles(files);
@@ -77,7 +70,7 @@ export class Generator {
 
         }        
 
-        console.log(chalk.cyanBright("Generating template content..."));
+        console.log(chalk.cyanBright("Parsing template content..."));
 
         //Parse Templates
         files = parser.ParseContent(files);
@@ -87,5 +80,35 @@ export class Generator {
 
         return files;
     }
+
+    async GenerateTemplate(cyanSafe: CyanSafe, templatePath: string, folderName: string) {
+        //dest file path
+        //cwd is where the user is calling from
+        let destPath: string = path.resolve(process.cwd(), folderName);
+
+        //Check if the target path is empty
+        if (fs.existsSync(destPath)) {
+            //ask if want to delete existing stuff
+        }
+
+        console.log(chalk.cyanBright("Preparing template, please wait..."));
+
+        let fileFactory: FileFactory = new FileFactory(templatePath, destPath);
+        let globFactory: GlobFactory = new GlobFactory(fileFactory, this.util);
+
+        let virtualFSInstances =  await this.GenerateVFS(cyanSafe, globFactory);
+        
+        //Asynchronous write to target directory
+        await globFactory.AWriteFile(virtualFSInstances);
+
+        console.log(chalk.cyanBright("Clearing residue directories..."));
+        const deleted = await deleteEmpty(folderName);
+        if (deleted)
+            console.log(chalk.greenBright(`Deleted ${deleted.join(", ")}`));
+        else
+            console.log(chalk.greenBright("No residue directories found!"));
+        return chalk.greenBright("Complete~!!");
+    }
+
 }
     

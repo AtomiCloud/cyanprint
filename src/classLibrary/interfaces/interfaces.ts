@@ -100,10 +100,10 @@ interface IGlobFactory {
 interface IFileFactory {
     CreateFileSystemInstanceMetadata(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
 
-    ConvertToEmptyFiles(filesMetadata: IFileSystemInstanceMetadata[]): VirtualFileSystemInstance[];
+    CreateEmptyFiles(filesMetadata: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[];
 
     // Callback is used to bump progress
-    ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<VirtualFileSystemInstance>;
+    ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;
 }
 
 interface IParsingStrategy {

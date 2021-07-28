@@ -1,5 +1,8 @@
 import chalk from "chalk";
 import { Core } from "@kirinnee/core";
+import { FileContent } from "../interfaces/interfaces";
+import fs from "fs";
+import path from "path";
 
 export class Utility {
     public readonly c: Core;
@@ -91,5 +94,52 @@ export class Utility {
             this.Increase(n, key, value);
         })
         return mCopy;
+    }
+
+    ASafeWriteFile(filePath: string, content: FileContent, binary: boolean, callback?: Function): Promise<void> {
+        if (fs.existsSync(filePath)) return new Promise<void>(resolve => {
+            if (typeof callback === "function") callback();
+            resolve()
+        });
+        this.EnsureDirectory(filePath);
+        return new Promise<void>(function (resolve) {
+            if (binary) {
+                fs.writeFile(filePath, content, function (err) {
+                    if (err) console.log(err);
+                    if (typeof callback === "function") callback();
+                    resolve();
+                });
+            } else {
+                fs.writeFile(filePath, content, 'utf8', function (err) {
+                    if (err) console.log(err);
+                    if (typeof callback === "function") callback();
+                    resolve();
+                });
+            }
+
+        });
+    }
+
+    ASafeCreateDirectory(filePath: string, callback?: Function): Promise<void> {
+        if (fs.existsSync(filePath)) return new Promise<void>(r => {
+            if (typeof callback === "function") callback();
+            r();
+        });
+        this.EnsureDirectory(filePath);
+        return new Promise<void>(function (resolve) {
+            fs.mkdir(filePath, function (err) {
+                if (err) console.log(err);
+                if (typeof callback === "function") callback();
+                resolve();
+            });
+        });
+    }
+
+    private EnsureDirectory(filePath: string): void {
+        let dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            this.EnsureDirectory(dir);
+            fs.mkdirSync(dir);
+        }
     }
 }
