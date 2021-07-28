@@ -1,6 +1,7 @@
 import path from 'path';
 import _glob from 'glob';
 import { DirectorySystemInstance, FileSystemInstance, Glob, 
+    IFileFactory, 
     IFileSystemInstanceMetadata, 
     IGlobFactory, 
     Ignore, 
@@ -16,15 +17,15 @@ interface options {
 }
 
 export class GlobFactory implements IGlobFactory {
-    private readonly fileFactory;
-    private readonly util;
+    private readonly fileFactory: IFileFactory;
+    private readonly util: Utility;
     
     constructor(fileFactory: FileFactory, util: Utility) {
         this.fileFactory = fileFactory
         this.util = util;
     }
     
-    GenerateFilesMetadata(glob: Glob, target: string): IFileSystemInstanceMetadata[] {
+    GenerateFilesMetadata(glob: Glob, target: string = './'): IFileSystemInstanceMetadata[] {
         let pattern = path.resolve(this.fileFactory.FromRoot, glob.root, glob.pattern as string);
 		let relPath = path.resolve(this.fileFactory.FromRoot, glob.root);
 		let opts: options = {dot: true}

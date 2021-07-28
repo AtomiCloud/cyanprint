@@ -104,19 +104,40 @@ export class Utility {
         this.EnsureDirectory(filePath);
         return new Promise<void>(function (resolve) {
             if (binary) {
-                fs.writeFile(filePath, content, function (err) {
-                    if (err) console.log(err);
-                    if (typeof callback === "function") callback();
-                    resolve();
-                });
+                FileContent.match(content, {
+                    String: (str: string) => {
+                        fs.writeFile(filePath, str, function (err) {
+                            if (err) console.log(err);
+                            if (typeof callback === "function") callback();
+                            resolve();
+                        });
+                    },
+                    Buffer: (buffer: Buffer) => {
+                        fs.writeFile(filePath, buffer, function (err) {
+                            if (err) console.log(err);
+                            if (typeof callback === "function") callback();
+                            resolve();
+                        });
+                    }
+                })
             } else {
-                fs.writeFile(filePath, content, 'utf8', function (err) {
-                    if (err) console.log(err);
-                    if (typeof callback === "function") callback();
-                    resolve();
-                });
+                FileContent.match(content, {
+                    String: (str: string) => {
+                        fs.writeFile(filePath, str, 'utf8', function (err) {
+                            if (err) console.log(err);
+                            if (typeof callback === "function") callback();
+                            resolve();
+                        });
+                    },
+                    Buffer: (buffer: Buffer) => {
+                        fs.writeFile(filePath, buffer, 'utf8', function (err) {
+                            if (err) console.log(err);
+                            if (typeof callback === "function") callback();
+                            resolve();
+                        });
+                    }
+                })
             }
-
         });
     }
 

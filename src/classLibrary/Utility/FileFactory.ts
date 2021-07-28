@@ -15,15 +15,9 @@ export class FileFactory implements IFileFactory {
         this.ToRoot = toRoot;
     }
 
-    CreateFileSystemInstanceMetadata(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata {
-        let absFrom = path.resolve(this.FromRoot);
-        let absTo = path.resolve(this.ToRoot, relativePath);
-        if (from != undefined) {
-            absFrom = path.resolve(this.FromRoot, from, relativePath);
-        }
-        if (to != undefined) {
-            absTo = path.resolve(this.ToRoot, to, relativePath);
-        } 
+    CreateFileSystemInstanceMetadata(relativePath:string, from: string = "./", to: string = './'): IFileSystemInstanceMetadata {
+        let absFrom = path.resolve(this.FromRoot, from, relativePath);
+        let absTo = path.resolve(this.ToRoot, to, relativePath);
         return {
             relativePath: relativePath,
             sourceAbsolutePath: absFrom,
@@ -69,7 +63,7 @@ export class FileFactory implements IFileFactory {
     }
 
     CreateEmptyFiles(filesMeta: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[] {
-        return filesMeta.Map((metadata: IFileSystemInstanceMetadata) => {
+        return filesMeta.map((metadata: IFileSystemInstanceMetadata) => {
             let ignoreConfig: Ignore = {
                 variableResolver:  {},
                 inlineResolver: {},

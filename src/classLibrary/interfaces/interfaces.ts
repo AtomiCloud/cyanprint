@@ -98,6 +98,9 @@ interface IGlobFactory {
 
 // TODO may need further review
 interface IFileFactory {
+    ToRoot: string;
+    FromRoot: string;
+
     CreateFileSystemInstanceMetadata(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
 
     CreateEmptyFiles(filesMetadata: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[];
