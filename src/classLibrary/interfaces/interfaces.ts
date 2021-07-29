@@ -93,7 +93,7 @@ interface IGlobFactory {
     GenerateFilesMetadata(glob: Glob, target: string): IFileSystemInstanceMetadata[];
 
     // Callback is used to bump progress
-    ReadFiles(files: VirtualFileSystemInstance[], callback?: Function): Promise<VirtualFileSystemInstance[]>;
+    ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]>;
 }
 
 // TODO may need further review

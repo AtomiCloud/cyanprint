@@ -24,8 +24,14 @@ export class GlobFactory implements IGlobFactory {
         this.fileFactory = fileFactory
         this.util = util;
     }
-    
-    GenerateFilesMetadata(glob: Glob, target: string = './'): IFileSystemInstanceMetadata[] {
+
+    /**
+	 * Generates the file metadata according to the root source path, root destination path, glob and specified target
+	 * returns the file metadatas
+	 * @param glob Glob from CyanObject from cyan.script.js
+     * @param targetDirFromDestRoot Optional filepath where the contents of the glob root should be generated at the destination root filepath
+	 */
+    GenerateFilesMetadata(glob: Glob, targetDirFromDestRoot: string = './'): IFileSystemInstanceMetadata[] {
         let pattern = path.resolve(this.fileFactory.FromRoot, glob.root, glob.pattern as string);
 		let relPath = path.resolve(this.fileFactory.FromRoot, glob.root);
 		let opts: options = {dot: true}
@@ -36,10 +42,10 @@ export class GlobFactory implements IGlobFactory {
         //returns all relative path from the glob root to the found file according to the glob pattern 
         //glob.sync returns all filenames matching the pattern
         let files: string[] = _glob.sync(pattern, opts).Map((s: string) => path.relative(relPath, s));
-		return files.Map(s => this.fileFactory.CreateFileSystemInstanceMetadata(s, glob.root, target));
+		return files.Map(relPath => this.fileFactory.CreateFileSystemInstanceMetadata(relPath, glob.root, targetDirFromDestRoot));
     }
 
-    async ReadFiles(files: VirtualFileSystemInstance[], callback?: Function): Promise<VirtualFileSystemInstance[]> {
+    async ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]> {
         let readBar: Bar = new Bar({}, Presets.shades_classic);
 		let readCounter: number = 0;
 		readBar.start(files.length, readCounter);

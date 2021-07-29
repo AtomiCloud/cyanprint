@@ -15,6 +15,13 @@ export class FileFactory implements IFileFactory {
         this.ToRoot = toRoot;
     }
 
+     /**
+	 * Generates the file metadata according to the relative path to the file/directory, directory from the source root path, destination root path
+	 * returns the file metadatas
+	 * @param relativePath relative path from the source root path including the optional filepaths
+     * @param from Optional filepath of the file/directory from the source root filepath
+     * @param to Optional filepath of the file/directory from the destination root filepath
+	 */
     CreateFileSystemInstanceMetadata(relativePath:string, from: string = "./", to: string = './'): IFileSystemInstanceMetadata {
         let absFrom = path.resolve(this.FromRoot, from, relativePath);
         let absTo = path.resolve(this.ToRoot, to, relativePath);
@@ -34,14 +41,18 @@ export class FileFactory implements IFileFactory {
                     if (isBinary) {
                         fs.readFile(file.metadata.sourceAbsolutePath, function (err, content: Buffer) {
                             if (err) console.log(err);
-                            this.TryCallback(callback);
+                            if (callback !== undefined) {
+                                callback();
+                            }
                             file.content = FileContent.Buffer(content);
                             resolve(VirtualFileSystemInstance.File(file));
                         });
                     } else {
                         fs.readFile(file.metadata.sourceAbsolutePath, 'utf8', function (err, content: string) {
                             if (err) console.log(err);
-                            this.TryCallback(callback);
+                            if (callback !== undefined) {
+                                callback();
+                            }
                             file.content = FileContent.String(content);
                             resolve(VirtualFileSystemInstance.File(file));
                         });
@@ -54,12 +65,6 @@ export class FileFactory implements IFileFactory {
             })
             
         });
-    }
-
-    TryCallback(callback?: Function): void {
-        if (typeof callback === "function") {
-            callback();
-        }
     }
 
     CreateEmptyFiles(filesMeta: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[] {

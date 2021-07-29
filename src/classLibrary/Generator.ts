@@ -43,7 +43,7 @@ export class Generator {
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
 
         //create globs (empty content vfs)
-        let filesMetadata: IFileSystemInstanceMetadata[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFilesMetadata(g)).Flatten();
+        let filesMetadata: IFileSystemInstanceMetadata[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFilesMetadata(g, g.root)).Flatten();
 
         //remove package.lock
         filesMetadata = filesMetadata.Where(f => !f.sourceAbsolutePath.includes("node_modules"))
@@ -81,7 +81,7 @@ export class Generator {
         return files;
     }
 
-    async GenerateTemplate(cyanSafe: CyanSafe, rTemplatePath: string, folderName: string) {
+    async GenerateTemplate(cyanSafe: CyanSafe, templatePath: string, folderName: string) {
         //dest file path
         //cwd is where the user is calling from
         let destPath: string = path.resolve(process.cwd(), folderName);
@@ -93,7 +93,7 @@ export class Generator {
 
         console.log(chalk.cyanBright("Preparing template, please wait..."));
 
-        let fileFactory: FileFactory = new FileFactory(rTemplatePath, destPath);
+        let fileFactory: FileFactory = new FileFactory(templatePath, destPath);
         let globFactory: GlobFactory = new GlobFactory(fileFactory, this.util);
 
         let virtualFSInstances =  await this.GenerateVFS(cyanSafe, globFactory);
