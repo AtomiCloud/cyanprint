@@ -101,6 +101,8 @@ export class Generator {
         //Asynchronous write to target directory
         await globFactory.AWriteFile(virtualFSInstances);
 
+        //use plugin handler
+
         console.log(chalk.cyanBright("Clearing residue directories..."));
         const deleted = await deleteEmpty(folderName);
         if (deleted)

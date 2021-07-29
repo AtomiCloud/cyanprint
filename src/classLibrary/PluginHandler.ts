@@ -1,15 +1,21 @@
-import { CyanSafe } from "./interfaces/interfaces";
+import { CyanSafe, IFileFactory } from "./interfaces/interfaces";
 import chalk from "chalk";
 import { spawn } from "child_process";
 import path from "path";
 
 export class PluginHandler {
+    private readonly fileFactory: IFileFactory;
+
+    constructor(fileFactory: IFileFactory ) {
+        this.fileFactory = fileFactory;
+    }
+
     async DownloadPlugins(cyanSafe: CyanSafe, folderName: string, templatePath: string) {
         let plugins: string[] = this.GetModules(cyanSafe, "api.cyanprint.dev");
         
         if (plugins.length > 0) {
             if (plugins.includes("npm")) {
-                this.DownloadNpm(folderName, templatePath);
+                this.DownloadNpm(cyanSafe, folderName, templatePath);
             }
             if (plugins.includes("github")) {
                 this.SetupGithub();
@@ -40,24 +46,32 @@ export class PluginHandler {
         }*/
     }
 
-    async DownloadNpm(folderName: string, templatePath: string) {
-        let absPath = path.resolve(templatePath, "package.json");
-        if (!absPath.includes("package.json")) {
+    async DownloadNpm(cyanSafe: CyanSafe, folderName: string, templatePath: string) {
+        let paths: string[] = cyanSafe.globs.map(glob => this.fileFactory.GetAbsoluteFilePathOfFileInDestinationPath("package.json", glob.root, glob.pattern as string, glob.ignore)).Flatten();
+        if (paths.length === 0) {
             console.info(chalk.yellowBright("package.json not found. Installation of NPM modules halted."));
             return;
         }
-        let cd: string = path.relative(templatePath, absPath);
+        //what should cd be?
+        let cds: string[] = paths.map(p => {
+            let destPath = path.resolve(process.cwd(), folderName);
+            return path.relative(destPath, p);
+        });
         console.log(chalk.cyanBright("Installing NPM modules"));
         let reply = "";
         let hasYarn = await this.ExecuteCommandSimple("yarn", ["-v"], "", true);
         if (hasYarn) {
             console.info(chalk.greenBright("Yarn Detected... Using yarn!"));
-            reply = await this.ExecuteCommand("yarn", ["--prefer-offline"], "Installed NPM Modules", folderName, cd);
-            if (reply == 'error') {
-                reply = await this.ExecuteCommand("yarn", [], "Installed NPM Modules", folderName, cd);
-            }
+            cds.map(async cd => {
+                reply = await this.ExecuteCommand("yarn", ["--prefer-offline"], "Installed NPM Modules", folderName, cd);
+                if (reply == 'error') {
+                    reply = await this.ExecuteCommand("yarn", [], "Installed NPM Modules", folderName, cd);
+                }
+            })
         } else {
-            reply = await this.ExecuteCommand("npm", ["i"], "Installed NPM Modules", folderName, cd);
+            cds.map(async cd => {
+                reply = await this.ExecuteCommand("npm", ["i"], "Installed NPM Modules", folderName, cd);
+            });
         }
         console.log(reply);
     }

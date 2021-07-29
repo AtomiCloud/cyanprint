@@ -75,6 +75,11 @@ interface Glob {
     ignore: string[] | string;
 }
 
+interface GlobSyncOptions {
+    dot?: boolean,
+    ignore?: string | string[]
+}
+
 interface IgnoreConfig {
     metadata: boolean;
     content: boolean;
@@ -107,6 +112,9 @@ interface IFileFactory {
 
     // Callback is used to bump progress
     ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;
+
+    GetAbsoluteFilePathOfFileInDestinationPath(fileName: string, fromRoot?: string, pattern?: string, ignore?: string | string[]): string[]
+
 }
 
 interface IParsingStrategy {
@@ -121,6 +129,7 @@ interface IParsingStrategy {
 
 export {
     Glob,
+    GlobSyncOptions,
     Syntax,
     CyanFlag,
     CyanVariable,

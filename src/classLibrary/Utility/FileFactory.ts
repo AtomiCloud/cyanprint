@@ -1,10 +1,15 @@
 import fs from "fs";
 import path from "path";
 import { isBinaryFile } from 'isbinaryfile';
-import { DirectorySystemInstance, FileContent, FileSystemInstance, IFileFactory, 
+import { DirectorySystemInstance, 
+    FileContent, 
+    FileSystemInstance, 
+    GlobSyncOptions, 
+    IFileFactory, 
     IFileSystemInstanceMetadata, 
     Ignore, 
     VirtualFileSystemInstance } from "../interfaces/interfaces";
+import _glob from "glob";
 
 export class FileFactory implements IFileFactory {
     readonly FromRoot: string;
@@ -30,6 +35,18 @@ export class FileFactory implements IFileFactory {
             sourceAbsolutePath: absFrom,
             destinationAbsolutePath: absTo,
         };
+    }
+
+    GetAbsoluteFilePathOfFileInDestinationPath(fileName: string, fromRoot: string = "./", pattern: string = "./", ignore?: string | string[]): string[] {
+        let pathPattern = path.resolve(this.ToRoot, fromRoot, pattern);
+		let opts: GlobSyncOptions = {dot: true}
+        if (ignore != null) {
+			opts.ignore = ignore;
+		}
+
+        //returns all absolute path according to the glob pattern 
+        let files: string[] = _glob.sync(pathPattern, opts);
+        return files.filter((path: string) => path.includes(fileName));
     }
 
     ReadFile(virtualFile: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance> {

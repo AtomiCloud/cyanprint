@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {should} from 'chai';
+import { should } from 'chai';
 import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
 import { FileContent, FileSystemInstance, IFileFactory, IFileSystemInstanceMetadata, Ignore, VirtualFileSystemInstance } from '../../src/classLibrary/interfaces/interfaces';
 import _glob from "glob";

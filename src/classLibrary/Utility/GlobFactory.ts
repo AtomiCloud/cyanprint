@@ -1,6 +1,7 @@
 import path from 'path';
 import _glob from 'glob';
 import { DirectorySystemInstance, FileSystemInstance, Glob, 
+    GlobSyncOptions, 
     IFileFactory, 
     IFileSystemInstanceMetadata, 
     IGlobFactory, 
@@ -10,11 +11,6 @@ import { FileFactory } from "./FileFactory";
 import { Bar, Presets } from 'cli-progress';
 import { Utility } from './Utility';
 import { isBinaryFile } from 'isbinaryfile';
-
-interface options {
-    dot?: boolean,
-    ignore?: string | string[]
-}
 
 export class GlobFactory implements IGlobFactory {
     private readonly fileFactory: IFileFactory;
@@ -34,7 +30,7 @@ export class GlobFactory implements IGlobFactory {
     GenerateFilesMetadata(glob: Glob, targetDirFromDestRoot: string = './'): IFileSystemInstanceMetadata[] {
         let pattern = path.resolve(this.fileFactory.FromRoot, glob.root, glob.pattern as string);
 		let relPath = path.resolve(this.fileFactory.FromRoot, glob.root);
-		let opts: options = {dot: true}
+		let opts: GlobSyncOptions = {dot: true}
         if (glob.ignore != null) {
 			opts.ignore = glob.ignore;
 		}
