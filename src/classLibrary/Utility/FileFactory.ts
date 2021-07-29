@@ -43,7 +43,6 @@ export class FileFactory implements IFileFactory {
         if (ignore != null) {
 			opts.ignore = ignore;
 		}
-
         //returns all absolute path according to the glob pattern 
         let files: string[] = _glob.sync(pathPattern, opts);
         return files.filter((path: string) => path.includes(fileName));

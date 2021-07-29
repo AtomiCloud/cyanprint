@@ -10,12 +10,12 @@ export class PluginHandler {
         this.fileFactory = fileFactory;
     }
 
-    async DownloadPlugins(cyanSafe: CyanSafe, folderName: string, templatePath: string) {
+    async DownloadPlugins(cyanSafe: CyanSafe, folderName: string) {
         let plugins: string[] = this.GetModules(cyanSafe, "api.cyanprint.dev");
         
         if (plugins.length > 0) {
             if (plugins.includes("npm")) {
-                this.DownloadNpm(cyanSafe, folderName, templatePath);
+                this.DownloadNpm(cyanSafe, folderName);
             }
             if (plugins.includes("github")) {
                 this.SetupGithub();
@@ -24,6 +24,7 @@ export class PluginHandler {
     }
 
     SetupGithub() {
+        //where to get the github details?
         /*let git: Git = docParser.GetGit()!;
 
         if (git) {
@@ -46,7 +47,7 @@ export class PluginHandler {
         }*/
     }
 
-    async DownloadNpm(cyanSafe: CyanSafe, folderName: string, templatePath: string) {
+    async DownloadNpm(cyanSafe: CyanSafe, folderName: string) {
         let paths: string[] = cyanSafe.globs.map(glob => this.fileFactory.GetAbsoluteFilePathOfFileInDestinationPath("package.json", glob.root, glob.pattern as string, glob.ignore)).Flatten();
         if (paths.length === 0) {
             console.info(chalk.yellowBright("package.json not found. Installation of NPM modules halted."));
