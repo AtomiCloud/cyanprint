@@ -17,6 +17,7 @@ import chalk from "chalk";
 import { FileFactory } from "./Utility/FileFactory";
 
 import deleteEmpty from "delete-empty";
+import { PackageResolver } from "./ParsingStrategies/PackageResolver";
 
 export class Generator {
     private readonly util: Utility;
@@ -29,12 +30,13 @@ export class Generator {
     
     async GenerateVFS(cyanSafe: CyanSafe, globFactory: GlobFactory): Promise<VirtualFileSystemInstance[]> {
     
-        //missing package resolver but need think how to expand it to beyond npm modules
+        //package resolver may need to think how to expand it to beyond npm modules
         let strategies: IParsingStrategy[] = [
             new GuidResolver(this.guidGenerator, this.util),
             new IfElseResolver(this.util),
             new InlineFlagResolver(this.util),
-            new VariableResolver(this.util)
+            new VariableResolver(this.util),
+            new PackageResolver(this.util)
         ];
 
         let parser: Parser = new Parser(this.util, strategies, cyanSafe);
