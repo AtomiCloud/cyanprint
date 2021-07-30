@@ -13,7 +13,8 @@ class Evaluator implements IEvaluator {
      * Locates the specific cyan.config.ts file within specific template and executes it
      */
     async Evaluate(templatePath: string, folderName: string, asker: IAsker, previousAnswers: any): Promise<CyanSafe> {
-        const absoluteConfigFilePath = path.resolve(templatePath, "./cyan.config.ts");
+        // Always look for cyan.config.js, user's responsibility to transpile from TS to JS
+        const absoluteConfigFilePath = path.resolve(templatePath, "./cyan.config.js");
         const relativeConfigPath = path.relative(__dirname, absoluteConfigFilePath);
 
         // TODO Include Execute logic where it can execute a separate a separate config file
