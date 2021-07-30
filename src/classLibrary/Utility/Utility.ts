@@ -4,12 +4,21 @@ import { FileContent } from "../interfaces/interfaces";
 import fs from "fs";
 import path from "path";
 
+declare global {
+    interface String {
+        FileName(): string;
+    }
+}
+
 export class Utility {
     public readonly c: Core;
 
     constructor(core: Core) {
         core.AssertExtend();
         this.c = core;
+        String.prototype.FileName = function (): string {
+            return this.ReplaceAll("\\\\", "/").split('.').Omit(1).join('.').split('/').Last();
+        };
     }
 
     static Throw(type: string, error: string, target?: object): void {
@@ -89,11 +98,11 @@ export class Utility {
 
     IncreaseInMap<T>(m: Map<T, number>, n:Map<T, number>) : Map<T, number>
     {
-        let mCopy = new Map(m);
-        mCopy.forEach((value:number, key: T) => {
-            this.Increase(n, key, value);
+        let nCopy = new Map(n);
+        m.forEach((value:number, key: T) => {
+            this.Increase(nCopy, key, value);
         })
-        return mCopy;
+        return nCopy;
     }
 
     ASafeWriteFile(filePath: string, content: FileContent, binary: boolean, callback?: Function): Promise<void> {

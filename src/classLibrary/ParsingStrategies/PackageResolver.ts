@@ -28,7 +28,7 @@ class PackageResolver implements IParsingStrategy {
     }
 
     //decide if to keep in package file or not
-	private ResolveJsonFile(map: Map<string, boolean>, file: FileSystemInstance): FileSystemInstance {
+	ResolveJsonFile(map: Map<string, boolean>, file: FileSystemInstance): FileSystemInstance {
         let fileCopy = Object.assign({}, file);
         FileContent.if.String(file.content, (str) => {
 			if (this.IsPackageDotJson(file)) {

@@ -8,6 +8,7 @@ let core: Core = new Kore();
 core.ExtendPrimitives();
 let u: Utility = new Utility(core);
 
+//to test increase + increase in map
 describe("Utility", () => {
 	describe("FlattenStringValueObject", () => {
 		it("should flatten objects with strings as values", () => {
@@ -86,4 +87,31 @@ describe("Utility", () => {
 			
 		});
     });
+
+	describe("IncreaseInMap", () => {	
+		it("should merge the maps and add the values for same keys", () => {
+			let map1: Map<string, number> = new Map([
+				["packages.mocha", 1],
+				["packages.chai", 1],
+				["packages.@types/mocha", 1],
+				["packages.@types/chai", 1]
+			]);
+			
+			let map2: Map<string, number> = new Map([
+				["packages.chai", 1],
+				["packages.@types/mocha", 1],
+			]);
+
+			let expected: [string, number][] = new Map([
+				["packages.mocha", 1],
+				["packages.chai", 2],
+				["packages.@types/mocha", 2],
+				["packages.@types/chai", 1]
+			])
+				.SortByKey(SortType.AtoZ)
+				.Arr();
+
+			(u.IncreaseInMap(map1, map2).SortByKey(SortType.AtoZ).Arr()).should.deep.equal(expected);
+		});
+	});
 })
