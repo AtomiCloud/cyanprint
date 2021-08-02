@@ -64,11 +64,12 @@ class CLIAsker implements IAsker {
     }
 
     private MakeInputQuestion(flag: string, questionWithDefaultValue: [string, string]): Question {
+        const [message, defaultValue] = questionWithDefaultValue;
         return {
             type: "input",
-            message: questionWithDefaultValue[1],
+            message,
             name: flag,
-            default: questionWithDefaultValue[0]
+            default: defaultValue
         };
     }
 
