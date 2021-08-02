@@ -1,6 +1,13 @@
 import { should } from 'chai';
 import { CyanParser } from "../../src/classLibrary/EvaluationStage/CyanParser";
-import { CyanFlag, CyanObject, CyanSafe, CyanVariable, Glob } from "../../src/classLibrary/interfaces/interfaces";
+import {
+    CyanFlag,
+    CyanObject,
+    CyanSafe,
+    CyanVariable,
+    Glob,
+    GlobSafe
+} from "../../src/classLibrary/interfaces/interfaces";
 
 should();
 
@@ -27,6 +34,33 @@ const globsArray: Glob[] = [
             inlineResolver: {metadata: true}
         },
         ignore: "**/postcss.config.js"
+    }
+];
+
+const globsSafeArray: GlobSafe[] = [
+    { // Fully initialized Glob
+        root: "./Template",
+        pattern: ["**/*.*", "**/.*"],
+        skip: {
+            variableResolver: {metadata: true, content: true},
+            inlineResolver: {metadata: true, content: true},
+            ifElseResolver: {metadata: true, content: true},
+            guidResolver: {metadata: true, content: true},
+            custom: {}
+        },
+        ignore: ["**/Javascript/**/*", "**/Typescript/**/*", "**/Common/**/*"]
+    },
+    { // Partial Glob
+        root: "./Template/Common/",
+        pattern: [".gitlab-ci.yml"],
+        skip: {
+            variableResolver: {metadata: true},
+            inlineResolver: {metadata: true},
+            guidResolver: {},
+            ifElseResolver: {},
+            custom: {}
+        },
+        ignore: ["**/postcss.config.js"]
     }
 ];
 
@@ -65,8 +99,8 @@ const fullCyanObject: Partial<CyanObject> = {
 };
 
 const expectedFullSafe: CyanSafe = {
-    globs: globsArray,
-    copyOnly: globsArray,
+    globs: globsSafeArray,
+    copyOnly: globsSafeArray,
     variable: cyanVariable,
     flags: {
         a: true,
@@ -138,23 +172,29 @@ const expectedAlternateSafe: CyanSafe = {
     globs: [
         {
             root: "./Template/Common/",
-            pattern: ".gitlab-ci.yml",
+            pattern: [".gitlab-ci.yml"],
             skip: {
                 variableResolver: {metadata: true},
-                inlineResolver: {metadata: true}
+                inlineResolver: {metadata: true},
+                guidResolver: {},
+                ifElseResolver: {},
+                custom: {}
             },
-            ignore: "**/postcss.config.js"
+            ignore: ["**/postcss.config.js"]
         }
     ],
     copyOnly: [
         {
             root: "./Template/Common/",
-            pattern: ".gitlab-ci.yml",
+            pattern: [".gitlab-ci.yml"],
             skip: {
                 variableResolver: {metadata: true},
-                inlineResolver: {metadata: true}
+                inlineResolver: {metadata: true},
+                guidResolver: {},
+                ifElseResolver: {},
+                custom: {}
             },
-            ignore: "**/postcss.config.js"
+            ignore: ["**/postcss.config.js"]
         }
     ],
     variable: {

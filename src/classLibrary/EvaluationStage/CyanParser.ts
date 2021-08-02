@@ -1,4 +1,4 @@
-import { CyanObject, CyanSafe, Glob, ICyanParser, Syntax } from "../interfaces/interfaces";
+import { CyanObject, CyanSafe, Glob, GlobSafe, ICyanParser, Syntax } from "../interfaces/interfaces";
 import _ from "lodash";
 
 class CyanParser implements ICyanParser {
@@ -16,8 +16,14 @@ class CyanParser implements ICyanParser {
             pluginData: {}
         }
 
-        if (cyanObject.globs) defaultCyanSafe.globs = ([] as Glob[]).Add(cyanObject.globs);
-        if (cyanObject.copyOnly) defaultCyanSafe.copyOnly = ([] as Glob[]).Add(cyanObject.copyOnly);
+        if (cyanObject.globs) {
+            const tempArray: Glob[] = ([] as Glob[]).Add(cyanObject.globs);
+            defaultCyanSafe.globs = tempArray.map((value) => this.ParseGlobToGlobSafe(value));
+        }
+        if (cyanObject.copyOnly) {
+            const tempArray: Glob[] = ([] as Glob[]).Add(cyanObject.copyOnly);
+            defaultCyanSafe.copyOnly = tempArray.map((value) => this.ParseGlobToGlobSafe(value));
+        }
         if (cyanObject.variable) defaultCyanSafe.variable = cyanObject.variable;
         if (cyanObject.flags) defaultCyanSafe.flags = cyanObject.flags;
         if (cyanObject.guid) defaultCyanSafe.guid = ([] as string[]).Add(cyanObject.guid);
@@ -29,6 +35,21 @@ class CyanParser implements ICyanParser {
         if (cyanObject.pluginData) defaultCyanSafe.pluginData = cyanObject.pluginData;
 
         return defaultCyanSafe;
+    }
+
+    private ParseGlobToGlobSafe(glob: Glob): GlobSafe {
+        return {
+            root: glob.root,
+            pattern: ([] as string[]).Add(glob.pattern),
+            skip: _.defaultsDeep(glob.skip, {
+                custom: {},
+                guidResolver: {},
+                ifElseResolver: {},
+                inlineResolver: {},
+                variableResolver: {},
+            }),
+            ignore: ([] as string[]).Add(glob.ignore)
+        }
     }
 }
 

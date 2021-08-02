@@ -8,7 +8,7 @@ export = async function (folderName: string, asker: IAsker): Promise<CyanObject>
     const answers = await asker.AskForInput(question);
 
     return {
-        globs: {root: "./Template", pattern: "**/*.*", skip: {}, ignore: ""},
+        globs: {root: "./Template", pattern: "**/*.*", ignore: ""},
         variable: answers,
     } as CyanObject;
 }

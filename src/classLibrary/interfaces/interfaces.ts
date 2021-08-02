@@ -26,8 +26,8 @@ interface CyanObject {
 
 // Parsed version
 interface CyanSafe {
-    globs: Glob[];
-    copyOnly: Glob[];
+    globs: GlobSafe[];
+    copyOnly: GlobSafe[];
     variable: CyanVariable;
     flags: CyanFlag;
     guid: string[];
@@ -89,6 +89,13 @@ interface Glob {
     pattern: string[] | string;
     skip: Partial<Ignore>;
     ignore: string[] | string;
+}
+
+interface GlobSafe {
+    root: string;
+    pattern: string[];
+    skip: Ignore;
+    ignore: string[];
 }
 
 interface IgnoreConfig {
@@ -175,6 +182,7 @@ interface IEvaluator {
 
 export {
     Glob,
+    GlobSafe,
     Syntax,
     CyanFlag,
     CyanVariable,

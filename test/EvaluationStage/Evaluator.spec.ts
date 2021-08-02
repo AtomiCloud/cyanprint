@@ -40,9 +40,15 @@ describe("Evaluator", () => {
                 globs: [
                     {
                         root: "./Template",
-                        pattern: "**/*.*",
-                        skip: {},
-                        ignore: ""
+                        pattern: ["**/*.*"],
+                        skip: {
+                            ifElseResolver: {},
+                            guidResolver: {},
+                            inlineResolver: {},
+                            variableResolver: {},
+                            custom: {}
+                        },
+                        ignore: [""]
                     }
                 ],
                 copyOnly: [],
