@@ -5,6 +5,9 @@ import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { CLIAsker } from "../../src/classLibrary/EvaluationStage/CLIAsker";
 import { Core, Kore } from "@kirinnee/core";
 import { CyanFlag, CyanSafe, CyanVariable } from "../../src/classLibrary/interfaces/interfaces";
+import sinon, { SinonSandbox } from "sinon";
+import inquirer from "inquirer";
+import path from "path";
 
 should();
 let core: Core = new Kore();
@@ -18,70 +21,40 @@ const cliAsker: CLIAsker = new CLIAsker(utility);
 
 describe("Evaluator", () => {
     describe("Evaluate", () => {
+        let sandbox: SinonSandbox;
+        before(() => {
+            sandbox = sinon.createSandbox();
+        });
+        afterEach(() => {
+            sandbox.restore();
+        });
 
         it("Should be able to evaluate a CyanScript and return the correct CyanSafe object", async () => {
-            const actual: CyanSafe = await evaluator.Evaluate("./", "SampleFolderName", cliAsker, null);
+            const stubReply = {name: "Kirito Lombok"};
+            sandbox.stub(inquirer, 'prompt').resolves(stubReply);
+
+            const templatePath = path.resolve(__dirname);
+            const actual: CyanSafe = await evaluator.Evaluate(templatePath, "SampleFolderName", cliAsker, null);
 
             const expected: CyanSafe = {
                 globs: [
-                    { // Fully initialized Glob
+                    {
                         root: "./Template",
-                        pattern: ["**/*.*", "**/.*"],
-                        skip: {
-                            variableResolver: {metadata: true, content: true},
-                            inlineResolver: {metadata: true, content: true},
-                            ifElseResolver: {metadata: true, content: true},
-                            guidResolver: {metadata: true, content: true},
-                            custom: {}
-                        },
-                        ignore: ["**/Javascript/**/*", "**/Typescript/**/*", "**/Common/**/*"]
-                    },
-                    { // Partial Glob
-                        root: "./Template/Common/",
-                        pattern: ".gitlab-ci.yml",
-                        skip: {
-                            variableResolver: {metadata: true},
-                            inlineResolver: {metadata: true}
-                        },
-                        ignore: "**/postcss.config.js"
+                        pattern: "**/*.*",
+                        skip: {},
+                        ignore: ""
                     }
                 ],
-                copyOnly: [{ // Partial Glob
-                    root: "./Template/Common/",
-                    pattern: ".gitlab-ci.yml",
-                    skip: {
-                        variableResolver: {metadata: true},
-                        inlineResolver: {metadata: true}
-                    },
-                    ignore: "**/postcss.config.js"
-                }],
+                copyOnly: [],
                 variable: {
-                    a: "Roses",
-                    b: {
-                        c: "Violets",
-                        d: {
-                            e: "please",
-                            f: "Apples"
-                        }
-                    },
-                    g: "Oreos"
+                    name: "Kirito Lombok"
                 } as CyanVariable,
-                flags: {
-                    a: true,
-                    b: {
-                        c: true,
-                        d: {
-                            e: false,
-                            f: false
-                        }
-                    },
-                    g: true
-                } as CyanFlag,
-                guid: ["6de0a74e-70a9-4cfc-be14-04789ecd44fa", "bc6b7b1a-6e23-4cd4-a6e7-4291f8238dd1"],
-                syntax: [["~", "~"], ["{", "}"], ["#", "#"], ["##", "}"]],
-                plugins: {"api.cyanprint.dev": ["npm, c#", "github"]},
-                comments: ["//", "##"],
-                pluginData: {"randomPlugin": "asdf"}
+                flags: {} as CyanFlag,
+                guid: [],
+                syntax: [],
+                plugins: {},
+                comments: [],
+                pluginData: {}
             };
 
             actual.should.deep.equal(expected);
