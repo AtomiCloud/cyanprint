@@ -1,6 +1,9 @@
 import { Core, Kore, SortType } from "@kirinnee/core";
 import { should } from "chai";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
+import path from "path";
+import { FileContent } from "../../src/classLibrary/interfaces/interfaces";
+import { glob } from "glob";
 
 should();
 
@@ -114,4 +117,32 @@ describe("Utility", () => {
 			(u.IncreaseInMap(map1, map2).SortByKey(SortType.AtoZ).Arr()).should.deep.equal(expected);
 		});
 	});
+
+	describe("ASafeWriteFile", () => {
+        it("should write file into correct directory", () => {
+			let folderName: string = "newDir"
+			let to: string = path.resolve(__dirname, folderName);
+            u.ASafeWriteFile(path.resolve(to, "./template/writeFile.txt"), FileContent.String("wrote file using Utility"), false);
+            
+			let expected = path.resolve(__dirname, folderName) + "/template/writeFile.txt";
+            
+			let pathPattern = path.resolve(to, "**/*.*");
+			//returns all absolute path according to the glob pattern 
+			let files: string[] = glob.sync(pathPattern).filter(str => str.includes("writeFile.txt"));
+			files[0].should.equal(expected);
+        })
+    })
+
+	describe("ASafeCreateDirectory", () => {
+        it("should create correct directory", () => {
+			let folderName: string = "createDir"
+			let to: string = path.resolve(__dirname, folderName);
+            u.ASafeCreateDirectory(to);
+                    
+			let pathPattern = path.resolve(__dirname, folderName);
+			//returns all absolute path according to the glob pattern 
+			let files: string[] = glob.sync(pathPattern)
+			files[0].should.equal(to);
+        })
+    })
 })

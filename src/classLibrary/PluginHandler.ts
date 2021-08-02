@@ -48,16 +48,19 @@ export class PluginHandler {
     }
 
     async DownloadNpm(cyanSafe: CyanSafe, folderName: string) {
-        let paths: string[] = cyanSafe.globs.map(glob => this.fileFactory.GetAbsoluteFilePathOfFileInDestinationPath("package.json", glob.root, glob.pattern as string, glob.ignore)).Flatten();
+        let paths: string[] = cyanSafe.globs.map(glob => this.fileFactory.GetAbsoluteFilePathsOfFileInDestinationPath("package.json", glob.root, glob.pattern as string, glob.ignore)).flat();
         if (paths.length === 0) {
             console.info(chalk.yellowBright("package.json not found. Installation of NPM modules halted."));
             return;
         }
+        console.log(paths);
         //what should cd be?
         let cds: string[] = paths.map(p => {
             let destPath = path.resolve(process.cwd(), folderName);
-            return path.relative(destPath, p);
+            let dirOfPackageJson = path.resolve(p, "..");
+            return path.relative(destPath, dirOfPackageJson);
         });
+        console.log(cds);
         console.log(chalk.cyanBright("Installing NPM modules"));
         let reply = "";
         let hasYarn = await this.ExecuteCommandSimple("yarn", ["-v"], "", true);
@@ -111,6 +114,7 @@ export class PluginHandler {
     async ExecuteCommand(command: string, variables: string[], done: string, cd?: string, cdExt?: string): Promise<string> {
         cdExt = cdExt || ".";
         let p = cd != null ? path.resolve(process.cwd(), cd, cdExt) : process.cwd();
+        console.log(p);
         return await new Promise<string>(function (resolve: (s: string) => void) {
             spawn(command, variables, {stdio: "inherit", shell: true, cwd: p})
                 .on("exit", (code: number) => {

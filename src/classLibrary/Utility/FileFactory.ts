@@ -37,7 +37,7 @@ export class FileFactory implements IFileFactory {
         };
     }
 
-    GetAbsoluteFilePathOfFileInDestinationPath(fileName: string, fromRoot: string = "./", pattern: string = "./", ignore?: string | string[]): string[] {
+    GetAbsoluteFilePathsOfFileInDestinationPath(fileName: string, fromRoot: string = "./", pattern: string = "**/*.*", ignore?: string | string[]): string[] {
         let pathPattern = path.resolve(this.ToRoot, fromRoot, pattern);
 		let opts: GlobSyncOptions = {dot: true}
         if (ignore != null) {

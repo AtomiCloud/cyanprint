@@ -18,6 +18,7 @@ import { FileFactory } from "./Utility/FileFactory";
 
 import deleteEmpty from "delete-empty";
 import { PackageResolver } from "./ParsingStrategies/PackageResolver";
+import { PluginHandler } from "./PluginHandler";
 
 export class Generator {
     private readonly util: Utility;
@@ -104,7 +105,9 @@ export class Generator {
         await globFactory.AWriteFile(virtualFSInstances);
 
         //use plugin handler
-
+        let pluginHandler: PluginHandler = new PluginHandler(fileFactory);
+        pluginHandler.DownloadPlugins(cyanSafe, folderName);
+        
         console.log(chalk.cyanBright("Clearing residue directories..."));
         const deleted = await deleteEmpty(folderName);
         if (deleted)

@@ -113,7 +113,7 @@ interface IFileFactory {
     // Callback is used to bump progress
     ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;
 
-    GetAbsoluteFilePathOfFileInDestinationPath(fileName: string, fromRoot?: string, pattern?: string, ignore?: string | string[]): string[]
+    GetAbsoluteFilePathsOfFileInDestinationPath(fileName: string, fromRoot?: string, pattern?: string, ignore?: string | string[]): string[]
 
 }
 

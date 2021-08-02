@@ -3,9 +3,12 @@ import { should } from 'chai';
 import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
 import { FileContent, FileSystemInstance, IFileFactory, IFileSystemInstanceMetadata, Ignore, VirtualFileSystemInstance } from '../../src/classLibrary/interfaces/interfaces';
 import _glob from "glob";
+import { Utility } from '../../src/classLibrary/Utility/Utility';
+import { Kore } from '@kirinnee/core';
 
 should();
 
+let util: Utility = new Utility(new Kore());
 let folderName: string = "newDir"
 let to: string = path.resolve(__dirname, folderName);
 let from = path.resolve(__dirname, '../target/testDir/');
@@ -91,4 +94,13 @@ describe("FileFactory", () => {
             })
 		});
 	});
+
+    describe("GetAbsoluteFilepathOfFileInDestinationFilepath", () => {
+        it("should return the filepath in the destination directory", () => {
+            util.ASafeWriteFile(path.resolve(to, "./template/test.txt"), FileContent.String("hello"), false);
+            let filepaths = fileFactory.GetAbsoluteFilePathsOfFileInDestinationPath("test.txt", "./template");
+            let expected = path.resolve(__dirname, folderName) + "/template/test.txt";
+            filepaths[0].should.be.equal(expected);
+        })
+    })
 });
