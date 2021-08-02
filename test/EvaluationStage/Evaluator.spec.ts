@@ -1,9 +1,9 @@
+import { Core, Kore } from "@kirinnee/core";
 import { should } from 'chai';
 import { Evaluator } from "../../src/classLibrary/EvaluationStage/Evaluator";
 import { CyanParser } from "../../src/classLibrary/EvaluationStage/CyanParser";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { CLIAsker } from "../../src/classLibrary/EvaluationStage/CLIAsker";
-import { Core, Kore } from "@kirinnee/core";
 import { CyanFlag, CyanSafe, CyanVariable } from "../../src/classLibrary/interfaces/interfaces";
 import sinon, { SinonSandbox } from "sinon";
 import inquirer from "inquirer";
