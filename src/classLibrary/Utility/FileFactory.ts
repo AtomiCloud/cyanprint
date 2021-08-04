@@ -11,7 +11,7 @@ import { DirectorySystemInstance,
     VirtualFileSystemInstance } from "../interfaces/interfaces";
 import _glob from "glob";
 
-export class FileFactory implements IFileFactory {
+class FileFactory implements IFileFactory {
     readonly FromRoot: string;
     readonly ToRoot: string;
 
@@ -21,20 +21,45 @@ export class FileFactory implements IFileFactory {
     }
 
      /**
-	 * Generates the file metadata according to the relative path to the file/directory, directory from the source root path, destination root path
-	 * returns the file metadatas
+	 * Generates the file instance according to the relative path to the file/directory, directory from the source root path, destination root path
+	 * returns the file
 	 * @param relativePath relative path from the source root path including the optional filepaths
      * @param from Optional filepath of the file/directory from the source root filepath
      * @param to Optional filepath of the file/directory from the destination root filepath
+     * @param to Optional ignore for the resolvers to ignore content or filepath
 	 */
-    CreateFileSystemInstanceMetadata(relativePath:string, from: string = "./", to: string = './'): IFileSystemInstanceMetadata {
+    CreateFileSystemInstance(relativePath:string, from: string = "./", to: string = './', ignore?: Ignore): VirtualFileSystemInstance {
         let absFrom = path.resolve(this.FromRoot, from, relativePath);
         let absTo = path.resolve(this.ToRoot, to, relativePath);
-        return {
+        let fileMetadata: IFileSystemInstanceMetadata = {
             relativePath: relativePath,
             sourceAbsolutePath: absFrom,
             destinationAbsolutePath: absTo,
         };
+        let ignoreConfig: Ignore = {
+            variableResolver:  {},
+            inlineResolver: {},
+            ifElseResolver: {},
+            guidResolver: {},
+            custom: {}
+        }
+        if (ignore !== undefined) {
+            ignoreConfig = ignore;
+        }
+        if (fs.lstatSync(absFrom).isFile()) {
+            let file: FileSystemInstance = {
+                metadata: fileMetadata,
+                content: FileContent.String(""),
+                ignore: ignoreConfig
+            };
+            return VirtualFileSystemInstance.File(file);
+        } else {
+            let folder: DirectorySystemInstance = {
+                metadata: fileMetadata,
+                ignore: ignoreConfig
+            }
+            return VirtualFileSystemInstance.Folder(folder);
+        }
     }
 
     GetAbsoluteFilePathsOfFileInDestinationPath(fileName: string, fromRoot: string = "./", pattern: string = "**/*.*", ignore?: string | string[]): string[] {
@@ -82,35 +107,6 @@ export class FileFactory implements IFileFactory {
             
         });
     }
-
-    CreateEmptyFiles(filesMeta: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[] {
-        return filesMeta.map((metadata: IFileSystemInstanceMetadata) => {
-            let ignoreConfig: Ignore = {
-                variableResolver:  {},
-                inlineResolver: {},
-                ifElseResolver: {},
-                guidResolver: {},
-                custom: {}
-            }
-            if (ignore !== undefined) {
-                ignoreConfig = ignore;
-            }
-            if (fs.lstatSync(metadata.sourceAbsolutePath).isFile()) {
-                let file: FileSystemInstance = {
-                    metadata: metadata,
-                    content: FileContent.String(""),
-                    ignore: ignoreConfig
-                };
-                return VirtualFileSystemInstance.File(file);
-             } else {
-                 let directory: DirectorySystemInstance =
-                 {
-                    metadata: metadata,
-                    ignore: ignoreConfig
-                } 
-                return VirtualFileSystemInstance.Folder(directory);
-            }
-        });
-    }
-
 }
+
+export { FileFactory };

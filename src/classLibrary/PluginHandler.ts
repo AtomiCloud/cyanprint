@@ -54,7 +54,6 @@ export class PluginHandler {
             return;
         }
         console.log(paths);
-        //what should cd be?
         let cds: string[] = paths.map(p => {
             let destPath = path.resolve(process.cwd(), folderName);
             let dirOfPackageJson = path.resolve(p, "..");
@@ -88,7 +87,6 @@ export class PluginHandler {
         return [];
     }
 
-     //taken from kirinnee/CyanPrint
      async ExecuteCommandSimple(command: string, variables: string[], cd?: string, ignore: boolean = false): Promise<boolean> {
         let p = cd != null ? path.resolve(process.cwd(), cd) : process.cwd();
     

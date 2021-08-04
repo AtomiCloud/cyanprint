@@ -4,7 +4,7 @@ import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
 import { GlobFactory } from "../../src/classLibrary/Utility/GlobFactory";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import path from "path";
-import { FileContent, FileSystemInstance, Glob, IFileFactory, IGlobFactory, Ignore, VirtualFileSystemInstance } from "../../src/classLibrary/interfaces/interfaces";
+import { FileContent, FileSystemInstance, Glob, IFileFactory, IFileSystemInstanceMetadata, IGlobFactory, Ignore, VirtualFileSystemInstance } from "../../src/classLibrary/interfaces/interfaces";
 
 should();
 
@@ -24,23 +24,29 @@ const templateIgnore: Ignore = {
 }
 
 describe("GlobFactory", () => {
-	describe("GenerateFilesMetadata", () => {
-		it("should return the filesystem instance metadata with correct filepaths", () => {
+	describe("GenerateFiles", () => {
+		it("should return the filesystem instance with correct filepaths", () => {
             let glob: Glob = {
                 root: "./template",
                 pattern: "**/*.*",
                 ignore: "",
                 skip: templateIgnore
             }
-            let metadatas = globFactory.GenerateFilesMetadata(glob, "./template");
-            let expected = [
-                {
+            let files = globFactory.GenerateFiles(glob, "./template");
+            let expectedMetadata: IFileSystemInstanceMetadata = {
                     sourceAbsolutePath: from + "/template/test.txt",
                     destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
                     relativePath: "test.txt"
-                }
-            ];
-            metadatas.should.deep.equal(expected);
+                };
+            let file: FileSystemInstance = {
+                metadata: expectedMetadata,
+                content: FileContent.String(""),
+                ignore: templateIgnore
+            }
+            let expected = [
+                VirtualFileSystemInstance.File(file)
+            ]
+            files.should.deep.equal(expected);
         })
     });
 
@@ -52,22 +58,19 @@ describe("GlobFactory", () => {
                 ignore: "",
                 skip: templateIgnore
             }
-            let metadatas = globFactory.GenerateFilesMetadata(glob, "./template");
-            let vfsInstances = metadatas.map(metadata => {
-                let file: FileSystemInstance = {
-                    metadata: metadata,
-                    content: FileContent.String(""),
-                    ignore: templateIgnore
-                } 
-                return VirtualFileSystemInstance.File(file);
-            });
+            let files = globFactory.GenerateFiles(glob, "./template");
+            let expectedMetadata: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: from + "/template/test.txt",
+                destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
+                relativePath: "test.txt"
+            };
             
-            let readVfsInstances = await globFactory.ReadFiles(vfsInstances);
+            let readVfsInstances = await globFactory.ReadFiles(files);
             readVfsInstances.map(readVFS => {
                 VirtualFileSystemInstance.match(readVFS, {
                     File: (file: FileSystemInstance) => {
                         file.content.should.deep.equal(FileContent.String("test"));
-                        file.metadata.should.deep.equal(metadatas[0]),
+                        file.metadata.should.deep.equal(expectedMetadata),
                         file.ignore.should.deep.equal(templateIgnore)
                     },
                     default: () => "1".should.equal("2")

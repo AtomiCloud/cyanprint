@@ -1,6 +1,7 @@
 import { CyanSafe, 
+    DirectorySystemInstance, 
+    FileSystemInstance, 
     Glob, 
-    IFileSystemInstanceMetadata, 
     IGuidGenerator, 
     IParsingStrategy, 
     VirtualFileSystemInstance } from "./interfaces/interfaces";
@@ -15,12 +16,10 @@ import path from "path";
 import { GlobFactory } from "./Utility/GlobFactory";
 import chalk from "chalk";
 import { FileFactory } from "./Utility/FileFactory";
-
 import deleteEmpty from "delete-empty";
-import { PackageResolver } from "./ParsingStrategies/PackageResolver";
 import { PluginHandler } from "./PluginHandler";
 
-export class Generator {
+class Executor {
     private readonly util: Utility;
     private guidGenerator: IGuidGenerator;
 
@@ -36,8 +35,7 @@ export class Generator {
             new GuidResolver(this.guidGenerator, this.util),
             new IfElseResolver(this.util),
             new InlineFlagResolver(this.util),
-            new VariableResolver(this.util),
-            new PackageResolver(this.util)
+            new VariableResolver(this.util)
         ];
 
         let parser: Parser = new Parser(this.util, strategies, cyanSafe);
@@ -46,15 +44,43 @@ export class Generator {
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
 
         //create globs (empty content vfs)
-        let filesMetadata: IFileSystemInstanceMetadata[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFilesMetadata(g, g.root)).Flatten();
+        let files: VirtualFileSystemInstance[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFiles(g, g.root)).Flatten();
 
         //remove package.lock
-        filesMetadata = filesMetadata.Where(f => !f.sourceAbsolutePath.includes("node_modules"))
-        .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "package-lock.json")
-        .Where(f => f.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "yarn.lock");
+        files = files.Where(f => { 
+            return VirtualFileSystemInstance.match(f, {
+                File: (file: FileSystemInstance) => {
+                    return !file.metadata.sourceAbsolutePath.includes("node_modules");
+                },
+                Folder: (folder: DirectorySystemInstance) => {
+                    return !folder.metadata.sourceAbsolutePath.includes("node_modules");
+                },
+                default: () => false
+            });
+        })
+        .Where(f => {
+            return VirtualFileSystemInstance.match(f, {
+                File: (file: FileSystemInstance) => {
+                    return (file.metadata.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "package-lock.json");
+                },
+                Folder: (folder: DirectorySystemInstance) => {
+                    return (folder.metadata.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "package-lock.json");
+                },
+                default: () => false
+            });
+        })
+        .Where(f => {
+            return VirtualFileSystemInstance.match(f, {
+                File: (file: FileSystemInstance) => {
+                    return (file.metadata.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "yarn.lock");
 
-        //no ignore is put
-        let files = globFactory.CreateEmptyFiles(filesMetadata);
+                },
+                Folder: (folder: DirectorySystemInstance) => {
+                    return (folder.metadata.sourceAbsolutePath.ReplaceAll("\\\\", "/").split("/").Last()! !== "yarn.lock");
+                },
+                default: () => false
+            });
+        });
 
         //count for paths
         parser.CountFiles(files);
@@ -87,11 +113,11 @@ export class Generator {
     async GenerateTemplate(cyanSafe: CyanSafe, templatePath: string, folderName: string) {
         //dest file path
         //cwd is where the user is calling from
-        let destPath: string = path.resolve(process.cwd(), folderName);
+        const destPath: string = path.resolve(process.cwd(), folderName);
 
         //Check if the target path is empty
         if (fs.existsSync(destPath)) {
-            //ask if want to delete existing stuff
+            //TODO: ask if want to delete existing stuff
         }
 
         console.log(chalk.cyanBright("Preparing template, please wait..."));
@@ -118,4 +144,5 @@ export class Generator {
     }
 
 }
-    
+
+export { Executor };

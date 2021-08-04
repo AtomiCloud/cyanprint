@@ -23,47 +23,44 @@ const templateIgnore: Ignore = {
 }
 
 describe("FileFactory", () => {
-	describe("CreateFileSystemInstanceMetadata", () => {
-		it("should return the filesystem instance metadata with correct filepaths 1", () => {
+	describe("CreateFileSystemInstance", () => {
+		it("should return the filesystem instance with correct filepaths 1", () => {
             let globRoot = "./template";
             let pattern = path.resolve(fileFactory.FromRoot, globRoot, "**/*.*");
             let relPath = path.resolve(fileFactory.FromRoot, globRoot);
             let relativePaths: string[] = _glob.sync(pattern, {dot:true}).map((s: string) => path.relative(relPath, s));
-            let metadatas = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstanceMetadata(path, globRoot, globRoot));
-            let expected = [
-                {
-                    sourceAbsolutePath: from + "/template/test.txt",
-                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
-                    relativePath: "test.txt"
-                }
-            ];
-            metadatas.should.deep.equal(expected);
-		});
-        it ("should return the filesystem instance metadata with correct filepaths 2", () => {
-            let metadata = fileFactory.CreateFileSystemInstanceMetadata("./template/test.txt");
-            let expected: IFileSystemInstanceMetadata = {
-                    sourceAbsolutePath: from + "/template/test.txt",
-                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
-                    relativePath: "./template/test.txt"
-                };
-            metadata.should.deep.equal(expected);
-        })
-	});
-
-    describe("CreateEmptyFiles", () => {
-        it("should return VFS instance with empty content", () => {
-            let metadata = fileFactory.CreateFileSystemInstanceMetadata("./template/test.txt");
-            let metadatas = [metadata];
-            let emptyFiles = fileFactory.CreateEmptyFiles(metadatas, templateIgnore);
+            let files = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstance(path, globRoot, globRoot));
+            let metadata: IFileSystemInstanceMetadata = {
+                sourceAbsolutePath: from + "/template/test.txt",
+                destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
+                relativePath: "test.txt"
+            }
             let file: FileSystemInstance = {
                 metadata: metadata,
                 content: FileContent.String(""),
                 ignore: templateIgnore
             }
-            let expectedFiles = [VirtualFileSystemInstance.File(file)];
-            emptyFiles.should.deep.equal(expectedFiles);
+            
+            let expected = [
+                VirtualFileSystemInstance.File(file)
+            ];
+            files.should.deep.equal(expected);
+		});
+        it ("should return the filesystem instance metadata with correct filepaths 2", () => {
+            let file = fileFactory.CreateFileSystemInstance("./template/test.txt");
+            let expectedMetadata: IFileSystemInstanceMetadata = {
+                    sourceAbsolutePath: from + "/template/test.txt",
+                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
+                    relativePath: "./template/test.txt"
+                };
+            let expectedFile: FileSystemInstance = {
+                metadata: expectedMetadata,
+                content: FileContent.String(""),
+                ignore: templateIgnore
+            }
+            file.should.deep.equal(VirtualFileSystemInstance.File(expectedFile));
         })
-    });
+	});
 
     describe("ReadFile", () => {
 		it("should return the VFS instance with correct content and paths", async () => {
@@ -71,19 +68,13 @@ describe("FileFactory", () => {
             let pattern = path.resolve(fileFactory.FromRoot, globRoot, "**/*.*");
             let relPath = path.resolve(fileFactory.FromRoot, globRoot);
             let relativePaths: string[] = _glob.sync(pattern, {dot:true}).map((s: string) => path.relative(relPath, s));
-            let metadatas = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstanceMetadata(path, globRoot, globRoot));
+            let files = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstance(path, globRoot, globRoot));
             let expectedMetadata: IFileSystemInstanceMetadata = {
                     sourceAbsolutePath: from + "/template/test.txt",
                     destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
                     relativePath: "test.txt"
                 }
-            
-            let file: FileSystemInstance = {
-                metadata: metadatas[0],
-                content: FileContent.String(""),
-                ignore: templateIgnore
-            } 
-            let readVFS = await fileFactory.ReadFile(VirtualFileSystemInstance.File(file));
+            let readVFS = await fileFactory.ReadFile(files[0]);
             VirtualFileSystemInstance.match(readVFS, {
                 File: (file: FileSystemInstance) => {
                     file.content.should.deep.equal(FileContent.String("test"));

@@ -11,7 +11,7 @@ import { Utility } from "./Utility/Utility";
 import { Bar, Presets } from "cli-progress";
 
 //taken from kirinnee/CyanPrint (to be edited later if needed)
-export class Parser {
+class Parser {
 	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
@@ -149,3 +149,5 @@ export class Parser {
 		}
 	}
 }
+
+export { Parser };

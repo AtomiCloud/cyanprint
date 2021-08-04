@@ -95,7 +95,7 @@ interface Ignore {
 
 // TODO may need further review
 interface IGlobFactory {
-    GenerateFilesMetadata(glob: Glob, target: string): IFileSystemInstanceMetadata[];
+    GenerateFiles(glob: Glob, targetDirFromDestRoot?: string): VirtualFileSystemInstance[];
 
     // Callback is used to bump progress
     ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]>;
@@ -106,9 +106,7 @@ interface IFileFactory {
     ToRoot: string;
     FromRoot: string;
 
-    CreateFileSystemInstanceMetadata(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
-
-    CreateEmptyFiles(filesMetadata: IFileSystemInstanceMetadata[], ignore?: Ignore): VirtualFileSystemInstance[];
+    CreateFileSystemInstance(relativePath:string, from?: string, to?: string, ignore?: Ignore): VirtualFileSystemInstance;
 
     // Callback is used to bump progress
     ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;

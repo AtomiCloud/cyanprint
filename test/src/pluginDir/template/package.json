@@ -1,8 +1,0 @@
-{
-    "scripts": {
-    },
-    "devDependencies": {
-      "@types/chai": "^4.1.6"
-    }
-  }
-  
