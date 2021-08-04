@@ -1,4 +1,3 @@
-import { should } from 'chai';
 import {
     CyanSafe,
     CyanVariable,
@@ -12,7 +11,6 @@ import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { VariableResolver } from "../../src/classLibrary/ParsingStrategies/VariableResolver";
 import _ from "lodash";
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -160,7 +158,7 @@ describe("VariableResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each variable for all different syntaxes", () => {
@@ -214,7 +212,7 @@ describe("VariableResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each variable for multi character syntaxes", () => {
@@ -268,7 +266,7 @@ describe("VariableResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not count variables for files marked to be not parsed", () => {
@@ -356,7 +354,7 @@ describe("VariableResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -436,7 +434,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should rename the file destinations with multi-syntax correctly", () => {
@@ -514,7 +512,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafeMultiSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should rename the file destinations with multi-character syntax correctly", () => {
@@ -592,7 +590,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not rename file destinations for files indicated as false parse", () => {
@@ -712,7 +710,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected, folder1Expected, folder2Expected];
 
             let actual = variableResolver.ResolveFiles(testCyanSafeMultiSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -777,7 +775,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveContents(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should replace the content variable with muilti syntax correctly", () => {
@@ -840,7 +838,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveContents(testCyanSafeMultiSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should replace the content variable with multi character syntax correctly", () => {
@@ -903,7 +901,7 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = variableResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not replace content variables for files that should not be parsed", () => {
@@ -998,13 +996,13 @@ describe("VariableResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected, folder1Expected, folder2Expected];
 
             let actual = variableResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
     describe("ModifyVariablesWithAllSyntax", () => {
         it("should pad variables with all open and close syntax terms", () => {
-            variableResolver.ModifyVariablesWithAllSyntax("package.name", testCyanSafe.syntax).should.deep.equal(["var~package.name~"]);
+            expect(variableResolver.ModifyVariablesWithAllSyntax("package.name", testCyanSafe.syntax)).toStrictEqual(["var~package.name~"]);
         });
     });
 
@@ -1057,8 +1055,7 @@ describe("VariableResolver", () => {
             let actual: string[] = variableResolver.CountPossibleUnaccountedFlags(testCyanSafeWithMultiCharacterSyntax, testSubject)
                 .Sort(SortType.AtoZ);
 
-            actual.should.deep.equal(expected);
-            
+            expect(actual).toStrictEqual(expected);
         });
     });
 });

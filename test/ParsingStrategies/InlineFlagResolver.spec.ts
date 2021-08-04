@@ -1,4 +1,3 @@
-import { should } from 'chai';
 import {
     CyanFlag,
     CyanSafe,
@@ -12,7 +11,6 @@ import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { InlineFlagResolver } from "../../src/classLibrary/ParsingStrategies/InlineFlagResolver";
 import _ from "lodash";
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -159,7 +157,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each inverse flag correctly", () => {
@@ -212,7 +210,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each flag and inverse flag correctly", () => {
@@ -265,7 +263,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
         
         it("should count the number of occurrences of each flag for all different syntaxes", () => {
@@ -316,7 +314,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each inverse flag for all different syntaxes", () => {
@@ -367,7 +365,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each flag and inverse flag for all different syntaxes", () => {
@@ -418,7 +416,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
         
         it("should count the number of occurrences of each flag for multi character syntaxes", () => {
@@ -469,7 +467,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each inverse flag for multi character syntaxes", () => {
@@ -520,7 +518,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should count the number of occurrences of each flag and inverse flag for multi character syntaxes", () => {
@@ -571,7 +569,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not count flags for files marked to be not parsed, ignoring the file metadata", () => {
@@ -653,7 +651,7 @@ describe("InlineFlagResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -730,7 +728,7 @@ describe("InlineFlagResolver", () => {
             let expected = [file1Expected, file2Expected];
 
             let actual = inlineFlagResolver.ResolveFiles(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected)
         });
     });
 
@@ -801,7 +799,7 @@ eget finibus venenatis.`;
             let expected = [file1Expected, file2Expected];
 
             let actual = inlineFlagResolver.ResolveContents(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected)
         });
        
         it("should resolve multi syntax flags content correctly", () => {
@@ -869,7 +867,7 @@ eget finibus venenatis.`;
             let expected = [file1Expected, file2Expected];
 
             let actual = inlineFlagResolver.ResolveContents(testCyanSafeMultiSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected)
         });
 
          
@@ -937,7 +935,7 @@ eget finibus venenatis.`;
             let expected = [file1Expected, file2Expected];
 
             let actual = inlineFlagResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should not alter content for files that should not be parsed", () => {
@@ -1053,13 +1051,15 @@ eget finibus venenatis.`;
             let expected = [file1Expected, file2Expected, file3Expected, folder1Expected, folder2Expected];
 
             let actual = inlineFlagResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected)
         });
     });
 
     describe("ModifyFlagsWithAllIfSyntax", () => {
         it("should pad flags with all if and its inverted syntax terms", () => {
-            inlineFlagResolver.ModifyFlagWithAllSyntax("hello", testCyanSafe.syntax).should.deep.equal([
+            expect(
+                inlineFlagResolver.ModifyFlagWithAllSyntax("hello", testCyanSafe.syntax)
+            ).toStrictEqual([
                 "flag~hello~"
             ]);
         });
@@ -1067,7 +1067,9 @@ eget finibus venenatis.`;
 
     describe("ModifyFlagsWithAllInverseIfSyntax", () => {
         it("should pad flags with all if and its inverted syntax terms", () => {
-            inlineFlagResolver.ModifyInverseFlagWithAllSyntax("hello", testCyanSafe.syntax).should.deep.equal([
+            expect(
+                inlineFlagResolver.ModifyInverseFlagWithAllSyntax("hello", testCyanSafe.syntax)
+            ).toStrictEqual([
                 "flag!~hello~"
             ]);
         });
@@ -1076,7 +1078,9 @@ eget finibus venenatis.`;
     describe("ShouldKeepStringWithInlineFlag", () => {
         it("should keep string with the true inline flag", () => {
             let syntaxes: string[] = ["~~a}}", "~a~"];
-            inlineFlagResolver.ShouldKeepStringWithInlineFlag(syntaxes, true, "Roses are redflag~~a}}").should.deep.equal(true)
+            expect(
+                inlineFlagResolver.ShouldKeepStringWithInlineFlag(syntaxes, true, "Roses are redflag~~a}}")
+            ).toStrictEqual(true);
         });
     });
 
@@ -1086,8 +1090,10 @@ eget finibus venenatis.`;
             let allSyntaxes: string[] = inlineFlagResolver.ModifyFlagWithAllSyntax("a", testCyanSafeWithMultiCharacterSyntax.syntax);
             let allPossibleSyntaxMap: Map<string[], boolean> = new Map<string[], boolean>();
             allPossibleSyntaxMap.set(allSyntaxes, true);
-            
-            inlineFlagResolver.ConstructContentForInlineFlags(content, allPossibleSyntaxMap, [], false).should.deep.equal("line2\nhelp me!\nViolets are blue\nflag!${a}$Oreos are black!!");
+
+            expect(
+                inlineFlagResolver.ConstructContentForInlineFlags(content, allPossibleSyntaxMap, [], false)
+            ).toStrictEqual("line2\nhelp me!\nViolets are blue\nflag!${a}$Oreos are black!!");
         });
     });
 
@@ -1095,7 +1101,9 @@ eget finibus venenatis.`;
         it("should generate the comments with the flags behind", () => {
             const signatures = ["flag~a~", "flag#a#"]
             const expected = ["//flag~a~", "//flag#a#"];
-            inlineFlagResolver.GenerateCommentsWithSignatureStrings(signatures, ["//"]).should.deep.equal(expected);
+            expect(
+                inlineFlagResolver.GenerateCommentsWithSignatureStrings(signatures, ["//"])
+            ).toStrictEqual(expected);
         });
     });
 
@@ -1148,7 +1156,7 @@ eget finibus venenatis.`;
             let actual: string[] = inlineFlagResolver.CountPossibleUnaccountedFlags(testCyanSafeWithMultiCharacterSyntax, testSubject)
                 .Sort(SortType.AtoZ);
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
             
         });
     });
