@@ -1,4 +1,3 @@
-import { should } from 'chai';
 import {
     CyanSafe,
     FileContent,
@@ -12,7 +11,6 @@ import { GuidResolver } from "../../src/classLibrary/ParsingStrategies/GuidResol
 import _ from 'lodash';
 import { Utility } from '../../src/classLibrary/Utility/Utility';
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -141,7 +139,7 @@ describe("GuidResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
 
 
@@ -236,7 +234,7 @@ describe("GuidResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -310,7 +308,7 @@ describe("GuidResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = guidResolver.ResolveFiles(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -390,7 +388,7 @@ describe("GuidResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = guidResolver.ResolveContents(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not replace content guid for files that should not be parsed", () => {
@@ -499,7 +497,7 @@ describe("GuidResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected, folder1Expected, folder2Expected];
 
             let actual = guidResolver.ResolveContents(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -534,7 +532,7 @@ describe("GuidResolver", () => {
             });
 
             guidResolver.ReplaceGuid(guidArr, file1);
-            file1.should.deep.equal(expected);
+            expect(file1).toStrictEqual(expected);
         });
     });
 });
