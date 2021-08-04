@@ -1,4 +1,3 @@
-import { should } from 'chai';
 import { CyanParser } from "../../src/classLibrary/EvaluationStage/CyanParser";
 import {
     CyanFlag,
@@ -8,8 +7,10 @@ import {
     Glob,
     GlobSafe
 } from "../../src/classLibrary/interfaces/interfaces";
+import { Core, Kore } from "@kirinnee/core";
 
-should();
+let core: Core = new Kore();
+core.ExtendPrimitives();
 
 const cyanParser = new CyanParser();
 
@@ -247,17 +248,17 @@ describe("CyanParser", () => {
 
         it("should convert similar CyanObject to a CyanSafe object properly without modification", () => {
             const actual: CyanSafe = cyanParser.Parse(fullCyanObject);
-            actual.should.deep.equal(expectedFullSafe);
+            expect(actual).toStrictEqual(expectedFullSafe);
         });
 
         it('should convert CyanObject with single value in fields to a CyanSafe object properly as an array', () => {
             const actual: CyanSafe = cyanParser.Parse(alternativeCyanObject);
-            actual.should.deep.equal(expectedAlternateSafe);
+            expect(actual).toStrictEqual(expectedAlternateSafe);
         });
 
         it('should convert CyanObject pluginData correctly', () => {
             const actual: CyanSafe = cyanParser.Parse(partialCyanObject);
-            actual.should.deep.equal(expectedPartialSafe);
+            expect(actual).toStrictEqual(expectedPartialSafe);
         });
     });
 });

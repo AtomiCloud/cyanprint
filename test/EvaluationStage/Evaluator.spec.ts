@@ -1,5 +1,4 @@
 import { Core, Kore } from "@kirinnee/core";
-import { should } from 'chai';
 import { Evaluator } from "../../src/classLibrary/EvaluationStage/Evaluator";
 import { CyanParser } from "../../src/classLibrary/EvaluationStage/CyanParser";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
@@ -9,7 +8,6 @@ import sinon, { SinonSandbox } from "sinon";
 import inquirer from "inquirer";
 import path from "path";
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -22,7 +20,7 @@ const cliAsker: CLIAsker = new CLIAsker(utility);
 describe("Evaluator", () => {
     describe("Evaluate", () => {
         let sandbox: SinonSandbox;
-        before(() => {
+        beforeAll(() => {
             sandbox = sinon.createSandbox();
         });
         afterEach(() => {
@@ -63,7 +61,7 @@ describe("Evaluator", () => {
                 pluginData: {}
             };
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected);
         });
     });
 });

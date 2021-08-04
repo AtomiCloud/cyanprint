@@ -1,12 +1,10 @@
 import { CLIAsker } from "../../src/classLibrary/EvaluationStage/CLIAsker";
 import inquirer from "inquirer";
 import sinon, { SinonSandbox } from "sinon";
-import { should } from "chai";
 import { Core, Kore } from "@kirinnee/core";
 import { InputAsTextInputType, InputsAsListType } from "../../src/classLibrary/interfaces/interfaces";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -16,7 +14,7 @@ const cliAsker: CLIAsker = new CLIAsker(utility);
 describe("CLIAsker", () => {
     describe("AskPredicate", () => {
         let sandbox: SinonSandbox;
-        before(() => {
+        beforeAll(() => {
             sandbox = sinon.createSandbox();
         });
         afterEach(() => {
@@ -27,34 +25,34 @@ describe("CLIAsker", () => {
             const stubReply = {predicate: "Yes"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
             const answer = await cliAsker.AskPredicate("This is a test question");
-            answer.should.equal(true);
+            expect(answer).toBe(true);
         });
 
         it("should return the right answer when user chooses No", async () => {
             const stubReply = {predicate: "No"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
             const answer = await cliAsker.AskPredicate("This is a test question");
-            answer.should.equal(false);
+            expect(answer).toBe(false);
         });
 
         it("should return the right answer when user chooses custom Yes option", async () => {
             const stubReply = {predicate: "CustomYes"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
             const answer = await cliAsker.AskPredicate("This is a custom test question", "CustomYes", "CustomNo");
-            answer.should.equal(true);
+            expect(answer).toBe(true);
         });
 
         it("should return the right answer when user chooses custom No option", async () => {
             const stubReply = {predicate: "CustomNo"};
             sandbox.stub(inquirer, 'prompt').resolves(stubReply);
             const answer = await cliAsker.AskPredicate("This is a custom test question", "CustomYes", "CustomNo");
-            answer.should.equal(false);
+            expect(answer).toBe(false);
         });
     });
 
     describe("AskAsList", () => {
         let sandbox: SinonSandbox;
-        before(() => {
+        beforeAll(() => {
             sandbox = sinon.createSandbox();
         });
         afterEach(() => {
@@ -78,7 +76,7 @@ describe("CLIAsker", () => {
                 gcp: false,
                 do: false
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
 
         it("should return the right keys for nested options", async () => {
@@ -102,7 +100,7 @@ describe("CLIAsker", () => {
                 "gcp.storage": false,
                 "do": false
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
 
         it("should return the right answer if the selected answer is nested", async () => {
@@ -126,13 +124,13 @@ describe("CLIAsker", () => {
                 "gcp.storage": false,
                 "do": false
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
     });
 
     describe("AskAsCheckbox", () => {
         let sandbox: SinonSandbox;
-        before(() => {
+        beforeAll(() => {
             sandbox = sinon.createSandbox();
         });
         afterEach(() => {
@@ -156,7 +154,7 @@ describe("CLIAsker", () => {
                 gcp: true,
                 do: false
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
 
         it("should return the right keys for nested options", async () => {
@@ -180,7 +178,7 @@ describe("CLIAsker", () => {
                 "gcp.storage": false,
                 "do": true
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
 
         it("should return the right answers if the selected answer is nested", async () => {
@@ -204,13 +202,13 @@ describe("CLIAsker", () => {
                 "gcp.storage": true,
                 "do": false
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
     });
 
     describe("AskForInput", () => {
         let sandbox: SinonSandbox;
-        before(() => {
+        beforeAll(() => {
             sandbox = sinon.createSandbox();
         });
         afterEach(() => {
@@ -228,7 +226,7 @@ describe("CLIAsker", () => {
             const expected = {
                 deploy: "Very fancy and secret bucket name"
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
 
         it("should return the right answers if there are multiple questions", async () => {
@@ -247,7 +245,7 @@ describe("CLIAsker", () => {
                 deploy: "Very fancy and secret bucket name",
                 aws_region: "ap-southeast-1"
             }
-            answer.should.deep.equal(expected);
+            expect(answer).toStrictEqual(expected);
         });
     });
 });

@@ -1,7 +1,6 @@
-import { should } from 'chai';
 import {
-    CyanSafe,
     CyanFlag,
+    CyanSafe,
     FileContent,
     IFileSystemInstanceMetadata,
     Ignore,
@@ -12,7 +11,6 @@ import { Utility } from "../../src/classLibrary/Utility/Utility";
 import { IfElseResolver } from "../../src/classLibrary/ParsingStrategies/IfElseResolver";
 import _ from "lodash";
 
-should();
 let core: Core = new Kore();
 core.ExtendPrimitives();
 
@@ -161,7 +159,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each inverse ifend correctly", () => {
@@ -217,7 +215,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of a each ifend and inverse ifend correctly", () => {
@@ -273,7 +271,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each ifend for all different syntaxes", () => {
@@ -327,7 +325,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each inverse ifend for all different syntaxes", () => {
@@ -381,7 +379,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each ifend and inverse ifend for all different syntaxes", () => {
@@ -435,7 +433,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each ifend for multi character syntaxes", () => {
@@ -489,7 +487,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each inverse ifend for multi character syntaxes", () => {
@@ -543,7 +541,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should count the number of occurrences of each ifend and inverse ifend for multi character syntaxes", () => {
@@ -597,7 +595,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
 
         it("should not count flags for files marked to be not parsed, ignoring the file metadata", () => {
@@ -685,7 +683,7 @@ describe("IfElseResolver", () => {
                 .SortByKey(SortType.AtoZ)
                 .Arr();
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
         });
     });
 
@@ -765,7 +763,7 @@ describe("IfElseResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = ifElseResolver.ResolveFiles(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
@@ -831,7 +829,7 @@ describe("IfElseResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = ifElseResolver.ResolveContents(testCyanSafe, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
        
         it("should replace the content within ifend and inverse ifend with multi syntax correctly", () => {
@@ -894,7 +892,7 @@ describe("IfElseResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = ifElseResolver.ResolveContents(testCyanSafeMultiSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
          
@@ -958,7 +956,7 @@ describe("IfElseResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected];
 
             let actual = ifElseResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
 
         it("should not replace content flags for files that should not be parsed", () => {
@@ -1053,13 +1051,13 @@ describe("IfElseResolver", () => {
             let expected = [file1Expected, file2Expected, file3Expected, folder1Expected, folder2Expected];
 
             let actual = ifElseResolver.ResolveContents(testCyanSafeWithMultiCharacterSyntax, testSubjects);
-            actual.should.deep.equal(expected)
+            expect(actual).toStrictEqual(expected);
         });
     });
 
     describe("ModifyFlagsWithAllIfSyntax", () => {
         it("should pad flags with all if and its inverted syntax terms", () => {
-            ifElseResolver.ModifyIfWithAllSyntax("hello", testCyanSafe.syntax).should.deep.equal([
+            expect(ifElseResolver.ModifyIfWithAllSyntax("hello", testCyanSafe.syntax)).toStrictEqual([
                 "if~hello~"
             ]);
         });
@@ -1067,7 +1065,7 @@ describe("IfElseResolver", () => {
 
     describe("ModifyFlagsWithAllInverseIfSyntax", () => {
         it("should pad flags with all if and its inverted syntax terms", () => {
-            ifElseResolver.ModifyInverseIfWithAllSyntax("hello", testCyanSafe.syntax).should.deep.equal([
+            expect(ifElseResolver.ModifyInverseIfWithAllSyntax("hello", testCyanSafe.syntax)).toStrictEqual([
                 "if!~hello~"
             ]);
         });
@@ -1075,7 +1073,7 @@ describe("IfElseResolver", () => {
 
     describe("RetrieveLineIndexContainingSyntax", () => {
         it("should retrieve all the line numbers with the syntax", () => {
-            ifElseResolver.RetrieveLineIndexContainingSyntax("if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}", "if~~b.d.f}}").should.deep.equal([
+            expect(ifElseResolver.RetrieveLineIndexContainingSyntax("if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}", "if~~b.d.f}}")).toStrictEqual([
                 0, 6
             ])
         });
@@ -1086,7 +1084,7 @@ describe("IfElseResolver", () => {
             const strContent: string = "if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}";
             const startIndexes: number[] = [0, 6];
             const endIndexes: number[] = [2, 8]
-            ifElseResolver.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent).should.deep.equal("if!{{b.c#\nViolets are blue\nend!{{b.c#");
+            expect(ifElseResolver.RemoveContentBetweenLineIndexes(startIndexes, endIndexes, strContent)).toStrictEqual("if!{{b.c#\nViolets are blue\nend!{{b.c#");
         });
     });
 
@@ -1094,8 +1092,8 @@ describe("IfElseResolver", () => {
         it("should remove all lines", () => {
             const strContent: string = "if~~b.d.f}}\nRoses are red\nend~~b.d.f}}\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nif~~b.d.f}}\nOreos are black!!\nend~~b.d.f}}";
             const indexes: number[] = [0, 6, 2, 8];
-            
-            ifElseResolver.RemoveLineIndexes(indexes, strContent).should.deep.equal("Roses are red\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nOreos are black!!");
+
+            expect(ifElseResolver.RemoveLineIndexes(indexes, strContent)).toStrictEqual("Roses are red\nif!{{b.c#\nViolets are blue\nend!{{b.c#\nOreos are black!!");
         });
     });
 
@@ -1147,7 +1145,7 @@ describe("IfElseResolver", () => {
             let actual: string[] = ifElseResolver.CountPossibleUnaccountedFlags(testCyanSafeWithMultiCharacterSyntax, testSubject)
                 .Sort(SortType.AtoZ);
 
-            actual.should.deep.equal(expected);
+            expect(actual).toStrictEqual(expected)
             
         });
     });
