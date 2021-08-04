@@ -82,11 +82,6 @@ interface GlobSafe {
     ignore: string[];
 }
 
-interface GlobSyncOptions {
-    dot?: boolean,
-    ignore?: string | string[]
-}
-
 interface IgnoreConfig {
     metadata: boolean;
     content: boolean;
@@ -98,6 +93,11 @@ interface Ignore {
     ifElseResolver: Partial<IgnoreConfig>;
     guidResolver: Partial<IgnoreConfig>;
     custom: object; // Reserved for custom parsing strategies from plugins
+}
+
+interface GlobSyncOptions {
+    dot?: boolean,
+    ignore?: string | string[]
 }
 
 // TODO may need further review
