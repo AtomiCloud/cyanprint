@@ -4,7 +4,7 @@ import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
 import { GlobFactory } from "../../src/classLibrary/Utility/GlobFactory";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import path from "path";
-import { FileContent, FileSystemInstance, Glob, IFileFactory, IFileSystemInstanceMetadata, IGlobFactory, Ignore, VirtualFileSystemInstance } from "../../src/classLibrary/interfaces/interfaces";
+import { FileContent, FileSystemInstance, GlobSafe, IFileFactory, IFileSystemInstanceMetadata, IGlobFactory, Ignore, VirtualFileSystemInstance } from "../../src/classLibrary/interfaces/interfaces";
 
 should();
 
@@ -26,10 +26,10 @@ const templateIgnore: Ignore = {
 describe("GlobFactory", () => {
 	describe("GenerateFiles", () => {
 		it("should return the filesystem instance with correct filepaths", () => {
-            let glob: Glob = {
+            let glob: GlobSafe = {
                 root: "./template",
-                pattern: "**/*.*",
-                ignore: "",
+                pattern: ["**/", "*.*"],
+                ignore: [""],
                 skip: templateIgnore
             }
             let files = globFactory.GenerateFiles(glob, "./template");
@@ -52,10 +52,10 @@ describe("GlobFactory", () => {
 
     describe("ReadFiles", () => {
 		it("should return the VFS instances with correct content and paths", async () => {
-            let glob: Glob = {
+            let glob: GlobSafe = {
                 root: "./template",
-                pattern: "**/*.*",
-                ignore: "",
+                pattern: ["**/*.*"],
+                ignore: [""],
                 skip: templateIgnore
             }
             let files = globFactory.GenerateFiles(glob, "./template");

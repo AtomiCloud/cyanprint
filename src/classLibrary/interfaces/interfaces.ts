@@ -18,8 +18,8 @@ interface CyanObject {
 
 // Parsed version
 interface CyanSafe {
-    globs: Glob[];
-    copyOnly: Glob[];
+    globs: GlobSafe[];
+    copyOnly: GlobSafe[];
     variable: CyanVariable;
     flags: CyanFlag;
     guid: string[];
@@ -75,6 +75,13 @@ interface Glob {
     ignore: string[] | string;
 }
 
+interface GlobSafe {
+    root: string;
+    pattern: string[];
+    skip: Ignore;
+    ignore: string[];
+}
+
 interface GlobSyncOptions {
     dot?: boolean,
     ignore?: string | string[]
@@ -95,7 +102,7 @@ interface Ignore {
 
 // TODO may need further review
 interface IGlobFactory {
-    GenerateFiles(glob: Glob, targetDirFromDestRoot?: string): VirtualFileSystemInstance[];
+    GenerateFiles(glob: GlobSafe, targetDirFromDestRoot?: string): VirtualFileSystemInstance[];
 
     // Callback is used to bump progress
     ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]>;
@@ -127,6 +134,7 @@ interface IParsingStrategy {
 
 export {
     Glob,
+    GlobSafe,
     GlobSyncOptions,
     Syntax,
     CyanFlag,

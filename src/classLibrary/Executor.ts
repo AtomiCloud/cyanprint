@@ -1,7 +1,7 @@
 import { CyanSafe, 
     DirectorySystemInstance, 
     FileSystemInstance, 
-    Glob, 
+    GlobSafe, 
     IGuidGenerator, 
     IParsingStrategy, 
     VirtualFileSystemInstance } from "./interfaces/interfaces";
@@ -44,7 +44,7 @@ class Executor {
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
 
         //create globs (empty content vfs)
-        let files: VirtualFileSystemInstance[] = cyanSafe.globs.Map((g: Glob) => globFactory.GenerateFiles(g, g.root)).Flatten();
+        let files: VirtualFileSystemInstance[] = cyanSafe.globs.Map((g: GlobSafe) => globFactory.GenerateFiles(g, g.root)).Flatten();
 
         //remove package.lock
         files = files.Where(f => { 

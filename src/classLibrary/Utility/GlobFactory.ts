@@ -1,6 +1,7 @@
 import path from 'path';
 import _glob from 'glob';
-import { DirectorySystemInstance, FileSystemInstance, Glob, 
+import { DirectorySystemInstance, FileSystemInstance, 
+    GlobSafe, 
     GlobSyncOptions, 
     IFileFactory, 
     IGlobFactory, 
@@ -25,8 +26,8 @@ class GlobFactory implements IGlobFactory {
 	 * @param glob Glob from CyanObject from cyan.script.js
      * @param targetDirFromDestRoot Optional filepath where the contents of the glob root should be generated at the destination root filepath
 	 */
-    GenerateFiles(glob: Glob, targetDirFromDestRoot: string = './'): VirtualFileSystemInstance[] {
-        let pattern = path.resolve(this.fileFactory.FromRoot, glob.root, glob.pattern as string);
+    GenerateFiles(glob: GlobSafe, targetDirFromDestRoot: string = './'): VirtualFileSystemInstance[] {
+        let pattern = path.resolve(this.fileFactory.FromRoot, glob.root, glob.pattern.join(''));
 		let relPath = path.resolve(this.fileFactory.FromRoot, glob.root);
 		let opts: GlobSyncOptions = {dot: true}
         if (glob.ignore != null) {
