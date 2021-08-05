@@ -1,11 +1,9 @@
 import { Core, Kore, SortType } from "@kirinnee/core";
-import { should } from "chai";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import path from "path";
 import { FileContent } from "../../src/classLibrary/interfaces/interfaces";
 import { glob } from "glob";
 
-should();
 
 let core: Core = new Kore();
 core.ExtendPrimitives();
@@ -44,11 +42,11 @@ describe("Utility", () => {
 				["try.really.get.this.to work", "how are you?"],
 				["package.@types/kirinnee.no", "sleeping"]
 			]).SortByKey(SortType.AtoZ);
-			
+
 			let actual: Map<string, string | [string, string]> = u.FlattenStringValueObject(testSubject).SortByKey(SortType.AtoZ);
-			
-			actual.Arr().should.deep.equal(expected.Arr());
-        })
+
+			expect(actual.Arr()).toStrictEqual(expected.Arr());
+		})
     })
 
     describe("FlattenBooleanValueObject", () => {	
@@ -86,8 +84,7 @@ describe("Utility", () => {
 			let actual: [string, boolean][] =
 				u.FlattenBooleanValueObject(testSubject).Arr()
 					.Sort(SortType.AtoZ, (s: [string, boolean]) => s["0"]);
-			expected.should.deep.equal(actual);
-			
+			expect(actual).toStrictEqual(expected);
 		});
     });
 
@@ -114,7 +111,7 @@ describe("Utility", () => {
 				.SortByKey(SortType.AtoZ)
 				.Arr();
 
-			(u.IncreaseInMap(map1, map2).SortByKey(SortType.AtoZ).Arr()).should.deep.equal(expected);
+			expect(u.IncreaseInMap(map1, map2).SortByKey(SortType.AtoZ).Arr()).toStrictEqual(expected);
 		});
 	});
 
@@ -129,7 +126,7 @@ describe("Utility", () => {
 			let pathPattern = path.resolve(to, "**/*.*");
 			//returns all absolute path according to the glob pattern 
 			let files: string[] = glob.sync(pathPattern).filter(str => str.includes("writeFile.txt"));
-			files[0].should.equal(expected);
+			expect(files[0]).toStrictEqual(expected);
         })
     })
 
@@ -142,7 +139,7 @@ describe("Utility", () => {
 			let pathPattern = path.resolve(__dirname, folderName);
 			//returns all absolute path according to the glob pattern 
 			let files: string[] = glob.sync(pathPattern)
-			files[0].should.equal(to);
+			expect(files[0]).toStrictEqual(to);
         })
     })
 })

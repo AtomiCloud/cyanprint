@@ -1,14 +1,20 @@
 import * as path from 'path';
-import { should } from 'chai';
 import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
-import { FileContent, FileSystemInstance, IFileFactory, IFileSystemInstanceMetadata, Ignore, VirtualFileSystemInstance } from '../../src/classLibrary/interfaces/interfaces';
+import {
+    FileContent,
+    FileSystemInstance,
+    IFileFactory,
+    IFileSystemInstanceMetadata,
+    Ignore,
+    VirtualFileSystemInstance
+} from '../../src/classLibrary/interfaces/interfaces';
 import _glob from "glob";
 import { Utility } from '../../src/classLibrary/Utility/Utility';
-import { Kore } from '@kirinnee/core';
+import { Core, Kore } from '@kirinnee/core';
 
-should();
-
-let util: Utility = new Utility(new Kore());
+let core: Core = new Kore();
+core.ExtendPrimitives();
+let util: Utility = new Utility(core);
 let folderName: string = "newDir"
 let to: string = path.resolve(__dirname, folderName);
 let from = path.resolve(__dirname, '../target/testDir/');
@@ -44,7 +50,7 @@ describe("FileFactory", () => {
             let expected = [
                 VirtualFileSystemInstance.File(file)
             ];
-            files.should.deep.equal(expected);
+            expect(files).toStrictEqual(expected);
 		});
         it ("should return the filesystem instance metadata with correct filepaths 2", () => {
             let file = fileFactory.CreateFileSystemInstance("./template/test.txt");
@@ -58,7 +64,7 @@ describe("FileFactory", () => {
                 content: FileContent.String(""),
                 ignore: templateIgnore
             }
-            file.should.deep.equal(VirtualFileSystemInstance.File(expectedFile));
+            expect(file).toStrictEqual(VirtualFileSystemInstance.File(expectedFile));
         })
 	});
 
@@ -77,11 +83,11 @@ describe("FileFactory", () => {
             let readVFS = await fileFactory.ReadFile(files[0]);
             VirtualFileSystemInstance.match(readVFS, {
                 File: (file: FileSystemInstance) => {
-                    file.content.should.deep.equal(FileContent.String("test"));
-                    file.metadata.should.deep.equal(expectedMetadata),
-                    file.ignore.should.deep.equal(templateIgnore)
+                    expect(file.content).toStrictEqual(FileContent.String("test"));
+                    expect(file.metadata).toStrictEqual(expectedMetadata);
+                    expect(file.ignore).toStrictEqual(templateIgnore);
                 },
-                default: () => "1".should.equal("2")
+                default: () => expect("1").toBe("2")
             })
 		});
 	});
@@ -91,7 +97,7 @@ describe("FileFactory", () => {
             util.ASafeWriteFile(path.resolve(to, "./template/test.txt"), FileContent.String("hello"), false);
             let filepaths = fileFactory.GetAbsoluteFilePathsOfFileInDestinationPath("test.txt", "./template");
             let expected = path.resolve(__dirname, folderName) + "/template/test.txt";
-            filepaths[0].should.be.equal(expected);
+            expect(filepaths[0]).toStrictEqual(expected);
         })
     })
 });

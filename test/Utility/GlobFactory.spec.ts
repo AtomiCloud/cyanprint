@@ -1,14 +1,22 @@
-import { Kore } from "@kirinnee/core";
-import { should } from "chai";
+import { Core, Kore } from "@kirinnee/core";
 import { FileFactory } from "../../src/classLibrary/Utility/FileFactory";
 import { GlobFactory } from "../../src/classLibrary/Utility/GlobFactory";
 import { Utility } from "../../src/classLibrary/Utility/Utility";
 import path from "path";
-import { FileContent, FileSystemInstance, GlobSafe, IFileFactory, IFileSystemInstanceMetadata, IGlobFactory, Ignore, VirtualFileSystemInstance } from "../../src/classLibrary/interfaces/interfaces";
+import {
+    FileContent,
+    FileSystemInstance,
+    GlobSafe,
+    IFileFactory,
+    IFileSystemInstanceMetadata,
+    IGlobFactory,
+    Ignore,
+    VirtualFileSystemInstance
+} from "../../src/classLibrary/interfaces/interfaces";
 
-should();
-
-let util: Utility = new Utility(new Kore());
+let core: Core = new Kore();
+core.ExtendPrimitives();
+let util: Utility = new Utility(core);
 let folderName: string = "newDir"
 let to: string = path.resolve(__dirname, folderName);
 let from = path.resolve(__dirname, '../target/testDir/');
@@ -46,7 +54,7 @@ describe("GlobFactory", () => {
             let expected = [
                 VirtualFileSystemInstance.File(file)
             ]
-            files.should.deep.equal(expected);
+            expect(files).toStrictEqual(expected);
         })
     });
 
@@ -69,11 +77,11 @@ describe("GlobFactory", () => {
             readVfsInstances.map(readVFS => {
                 VirtualFileSystemInstance.match(readVFS, {
                     File: (file: FileSystemInstance) => {
-                        file.content.should.deep.equal(FileContent.String("test"));
-                        file.metadata.should.deep.equal(expectedMetadata),
-                        file.ignore.should.deep.equal(templateIgnore)
+                        expect(file.content).toStrictEqual(FileContent.String("test"));
+                        expect(file.metadata).toStrictEqual(expectedMetadata);
+                        expect(file.ignore).toStrictEqual(templateIgnore);
                     },
-                    default: () => "1".should.equal("2")
+                    default: () => expect("1").toStrictEqual("2")
                 })
             })
 		});
