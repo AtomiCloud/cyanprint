@@ -116,7 +116,6 @@ interface GlobSyncOptions {
     ignore?: string | string[]
 }
 
-// TODO may need further review
 interface IGlobFactory {
     GenerateFiles(glob: GlobSafe, targetDirFromDestRoot?: string): VirtualFileSystemInstance[];
 
@@ -124,12 +123,11 @@ interface IGlobFactory {
     ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]>;
 }
 
-// TODO may need further review
 interface IFileFactory {
     ToRoot: string;
     FromRoot: string;
 
-    CreateFileSystemInstance(relativePath:string, from?: string, to?: string, ignore?: Ignore): VirtualFileSystemInstance;
+    CreateFileSystemInstance(relativePath: string, from?: string, to?: string, ignore?: Ignore): VirtualFileSystemInstance;
 
     // Callback is used to bump progress
     ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;

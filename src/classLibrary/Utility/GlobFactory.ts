@@ -1,11 +1,14 @@
 import path from 'path';
 import _glob from 'glob';
-import { DirectorySystemInstance, FileSystemInstance, 
-    GlobSafe, 
-    GlobSyncOptions, 
-    IFileFactory, 
-    IGlobFactory, 
-    VirtualFileSystemInstance} from "../interfaces/interfaces";
+import {
+    DirectorySystemInstance,
+    FileSystemInstance,
+    GlobSafe,
+    GlobSyncOptions,
+    IFileFactory,
+    IGlobFactory,
+    VirtualFileSystemInstance
+} from "../interfaces/interfaces";
 import { FileFactory } from "./FileFactory";
 import { Bar, Presets } from 'cli-progress';
 import { Utility } from './Utility';
