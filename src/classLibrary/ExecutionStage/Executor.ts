@@ -1,23 +1,25 @@
-import { CyanSafe, 
-    DirectorySystemInstance, 
-    FileSystemInstance, 
-    GlobSafe, 
-    IGuidGenerator, 
-    IParsingStrategy, 
-    VirtualFileSystemInstance } from "./interfaces/interfaces";
-import { Parser } from "./Parser";
-import { GuidResolver } from "./ParsingStrategies/GuidResolver";
-import { IfElseResolver } from "./ParsingStrategies/IfElseResolver";
-import { InlineFlagResolver } from "./ParsingStrategies/InlineFlagResolver";
-import { VariableResolver } from "./ParsingStrategies/VariableResolver";
-import { Utility } from "./Utility/Utility";
+import {
+    CyanSafe,
+    DirectorySystemInstance,
+    FileSystemInstance,
+    GlobSafe,
+    IGuidGenerator,
+    IParsingStrategy,
+    VirtualFileSystemInstance
+} from "../interfaces/interfaces";
+import { GuidResolver } from "../ParsingStrategies/GuidResolver";
+import { IfElseResolver } from "../ParsingStrategies/IfElseResolver";
+import { InlineFlagResolver } from "../ParsingStrategies/InlineFlagResolver";
+import { VariableResolver } from "../ParsingStrategies/VariableResolver";
+import { Utility } from "../Utility/Utility";
 import fs from "fs";
 import path from "path";
-import { GlobFactory } from "./Utility/GlobFactory";
+import { GlobFactory } from "../Utility/GlobFactory";
 import chalk from "chalk";
-import { FileFactory } from "./Utility/FileFactory";
+import { FileFactory } from "../Utility/FileFactory";
 import deleteEmpty from "delete-empty";
-import { PluginHandler } from "./PluginHandler";
+import { PluginHandler } from "../PluginHandler";
+import { AllParsers } from "./AllParsers";
 
 class Executor {
     private readonly util: Utility;
@@ -38,7 +40,7 @@ class Executor {
             new VariableResolver(this.util)
         ];
 
-        let parser: Parser = new Parser(this.util, strategies, cyanSafe);
+        let parser: AllParsers = new AllParsers(this.util, strategies, cyanSafe);
 
         console.log(chalk.greenBright("Preparation done!"));
         console.log(chalk.cyanBright("Performing variable and flag scans..."));
@@ -96,7 +98,7 @@ class Executor {
         
         //if there are unused flags
         if (!isNoUnusedFlags) {
-
+            // TODO handle provided but unused variables in template files
         }        
 
         console.log(chalk.cyanBright("Parsing template content..."));

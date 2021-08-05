@@ -1,24 +1,21 @@
-import { IParsingStrategy, 
-    VirtualFileSystemInstance,
-    CyanSafe,
-} from "./interfaces/interfaces";
+import { CyanSafe, IParsingStrategy, VirtualFileSystemInstance, } from "../interfaces/interfaces";
 import chalk from "chalk";
-import { GuidResolver } from "./ParsingStrategies/GuidResolver";
-import { IfElseResolver } from "./ParsingStrategies/IfElseResolver";
-import { InlineFlagResolver } from "./ParsingStrategies/InlineFlagResolver";
-import { VariableResolver } from "./ParsingStrategies/VariableResolver";
-import { Utility } from "./Utility/Utility";
+import { GuidResolver } from "../ParsingStrategies/GuidResolver";
+import { IfElseResolver } from "../ParsingStrategies/IfElseResolver";
+import { InlineFlagResolver } from "../ParsingStrategies/InlineFlagResolver";
+import { VariableResolver } from "../ParsingStrategies/VariableResolver";
+import { Utility } from "../Utility/Utility";
 import { Bar, Presets } from "cli-progress";
 
 //taken from kirinnee/CyanPrint (to be edited later if needed)
-class Parser {
+class AllParsers {
 	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
 	private readonly strategies: IParsingStrategy[];
 	private readonly settings: CyanSafe;
 	private readonly util: Utility;
-	
+
 	constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
 		this.strategies = strategies;
 		this.settings = settings;
@@ -141,7 +138,7 @@ class Parser {
 		}
 		return ret;
 	}
-	
+
 	WarnOfZeroOccurence(type: string, variables: string[]) {
 		if (variables.length > 0) {
 			console.log(chalk.redBright(`[Warning] The following ${type} do not exist in the template`));
@@ -150,4 +147,4 @@ class Parser {
 	}
 }
 
-export { Parser };
+export { AllParsers };
