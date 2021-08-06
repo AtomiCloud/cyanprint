@@ -7,8 +7,8 @@ import { VariableResolver } from "../ParsingStrategies/VariableResolver";
 import { Utility } from "../Utility/Utility";
 import { Bar, Presets } from "cli-progress";
 
-//taken from kirinnee/CyanPrint (to be edited later if needed)
 class AllParsers {
+
 	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
@@ -16,13 +16,13 @@ class AllParsers {
 	private readonly settings: CyanSafe;
 	private readonly util: Utility;
 
-	constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
+	constructor(util: Utility, strategies: IParsingStrategy[], cyanSafe: CyanSafe) {
 		this.strategies = strategies;
-		this.settings = settings;
+		this.settings = cyanSafe;
 		this.util = util;
-		this.flagCounter = util.FlattenBooleanValueObject(settings.flags).MapValue(() => 0);
-		this.variableCounter = util.FlattenStringValueObject(settings.variable).MapValue(() => 0);
-		this.guidCounter = settings.guid.AsKey((() => 0));
+		this.flagCounter = util.FlattenBooleanValueObject(cyanSafe.flags).MapValue(() => 0);
+		this.variableCounter = util.FlattenStringValueObject(cyanSafe.variable).MapValue(() => 0);
+		this.guidCounter = cyanSafe.guid.AsKey(() => 0);
 	}
 	
 	ParseFiles(files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {

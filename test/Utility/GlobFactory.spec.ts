@@ -42,10 +42,10 @@ describe("GlobFactory", () => {
             }
             let files = globFactory.GenerateFiles(glob, "./template");
             let expectedMetadata: IFileSystemInstanceMetadata = {
-                    sourceAbsolutePath: from + "/template/test.txt",
-                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
-                    relativePath: "test.txt"
-                };
+                sourceAbsolutePath: path.resolve(from, "template", "test.txt"),
+                destinationAbsolutePath: path.resolve(__dirname, folderName, "template", "test.txt"),
+                relativePath: "test.txt"
+            };
             let file: FileSystemInstance = {
                 metadata: expectedMetadata,
                 content: FileContent.String(""),
@@ -68,8 +68,8 @@ describe("GlobFactory", () => {
             }
             let files = globFactory.GenerateFiles(glob, "./template");
             let expectedMetadata: IFileSystemInstanceMetadata = {
-                sourceAbsolutePath: from + "/template/test.txt",
-                destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
+                sourceAbsolutePath: path.resolve(from, "template", "test.txt"),
+                destinationAbsolutePath: path.resolve(__dirname, folderName, "template", "test.txt"),
                 relativePath: "test.txt"
             };
             

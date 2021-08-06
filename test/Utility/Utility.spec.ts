@@ -126,7 +126,7 @@ describe("Utility", () => {
 			let pathPattern = path.resolve(to, "**/*.*");
 			//returns all absolute path according to the glob pattern 
 			let files: string[] = glob.sync(pathPattern).filter(str => str.includes("writeFile.txt"));
-			expect(files[0]).toStrictEqual(expected);
+			expect(files[0].StandardizePath()).toStrictEqual(expected.StandardizePath());
         })
     })
 
@@ -139,7 +139,7 @@ describe("Utility", () => {
 			let pathPattern = path.resolve(__dirname, folderName);
 			//returns all absolute path according to the glob pattern 
 			let files: string[] = glob.sync(pathPattern)
-			expect(files[0]).toStrictEqual(to);
+			expect(files[0].StandardizePath()).toStrictEqual(to.StandardizePath());
         })
     })
 })

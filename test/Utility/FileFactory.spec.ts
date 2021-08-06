@@ -37,8 +37,8 @@ describe("FileFactory", () => {
             let relativePaths: string[] = _glob.sync(pattern, {dot:true}).map((s: string) => path.relative(relPath, s));
             let files = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstance(path, globRoot, globRoot));
             let metadata: IFileSystemInstanceMetadata = {
-                sourceAbsolutePath: from + "/template/test.txt",
-                destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
+                sourceAbsolutePath: path.resolve(from, "template", "test.txt"),
+                destinationAbsolutePath: path.resolve(__dirname, folderName, "template", "test.txt"),
                 relativePath: "test.txt"
             }
             let file: FileSystemInstance = {
@@ -55,10 +55,10 @@ describe("FileFactory", () => {
         it ("should return the filesystem instance metadata with correct filepaths 2", () => {
             let file = fileFactory.CreateFileSystemInstance("./template/test.txt");
             let expectedMetadata: IFileSystemInstanceMetadata = {
-                    sourceAbsolutePath: from + "/template/test.txt",
-                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
-                    relativePath: "./template/test.txt"
-                };
+                sourceAbsolutePath: path.resolve(from, "template", "test.txt"),
+                destinationAbsolutePath: path.resolve(__dirname, folderName, "template", "test.txt"),
+                relativePath: "./template/test.txt"
+            };
             let expectedFile: FileSystemInstance = {
                 metadata: expectedMetadata,
                 content: FileContent.String(""),
@@ -76,10 +76,10 @@ describe("FileFactory", () => {
             let relativePaths: string[] = _glob.sync(pattern, {dot:true}).map((s: string) => path.relative(relPath, s));
             let files = relativePaths.map((path: string) => fileFactory.CreateFileSystemInstance(path, globRoot, globRoot));
             let expectedMetadata: IFileSystemInstanceMetadata = {
-                    sourceAbsolutePath: from + "/template/test.txt",
-                    destinationAbsolutePath: path.resolve(__dirname, folderName) + "/template/test.txt",
-                    relativePath: "test.txt"
-                }
+                sourceAbsolutePath: path.resolve(from, "template", "test.txt"),
+                destinationAbsolutePath: path.resolve(__dirname, folderName, "template", "test.txt"),
+                relativePath: "test.txt"
+            }
             let readVFS = await fileFactory.ReadFile(files[0]);
             VirtualFileSystemInstance.match(readVFS, {
                 File: (file: FileSystemInstance) => {
@@ -96,8 +96,8 @@ describe("FileFactory", () => {
         it("should return the filepath in the destination directory", () => {
             util.ASafeWriteFile(path.resolve(to, "./template/test.txt"), FileContent.String("hello"), false);
             let filepaths = fileFactory.GetAbsoluteFilePathsOfFileInDestinationPath("test.txt", "./template");
-            let expected = path.resolve(__dirname, folderName) + "/template/test.txt";
-            expect(filepaths[0]).toStrictEqual(expected);
+            let expected = path.resolve(__dirname, folderName, "template", "test.txt");
+            expect(filepaths[0].StandardizePath()).toStrictEqual(expected.StandardizePath());
         })
     })
 });

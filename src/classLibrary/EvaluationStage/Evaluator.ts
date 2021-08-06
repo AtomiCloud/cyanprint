@@ -20,7 +20,7 @@ class Evaluator implements IEvaluator {
         // TODO Include Execute logic where it can execute a separate a separate config file
 
         const CyanScript: (folderName: string, asker: IAsker) => Promise<CyanObject>
-            = eval(`require("${relativeConfigPath.ReplaceAll("\\\\", "/", true)}")`);
+            = eval(`require("${relativeConfigPath.StandardizePath()}")`);
         const cyanObject: CyanObject = await CyanScript(folderName, asker);
 
         return this.cyanParser.Parse(cyanObject);
