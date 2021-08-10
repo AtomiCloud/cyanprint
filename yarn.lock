@@ -692,6 +692,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/delete-empty@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/delete-empty/-/delete-empty-3.0.1.tgz#f69ad03e7e415b0255eb35cc6c7f72525b7bd2ea"
+  integrity sha512-22NvGVJHjwgw6s7n4Od+9KkNHl2roqIFo9EHlyfhdQyLvTMYPcG0Ro93WEBjYRbx6EVtENJA6UjFpbuXYJ42fQ==
+
 "@types/glob@^7.1.1":
   version "7.1.3"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.3.tgz#e6ba80f36b7daad2c685acd9266382e68985c183"
@@ -766,6 +771,11 @@
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.3.2.tgz#fc8c2825e4ed2142473b4a81064e6e081463d1b3"
   integrity sha512-eI5Yrz3Qv4KPUa/nSIAi0h+qX0XyewOliug5F2QAtuRg6Kjg6jfmxe1GIwoIRhZspD1A0RP8ANrPwvEXXtRFog==
+
+"@types/relaxed-json@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/relaxed-json/-/relaxed-json-1.0.1.tgz#fa59a05b8b065cde9f90b68543c1fedcfc94c3b3"
+  integrity sha512-UnBKvLCa16RNrNeq8K2NoiAN6Whrw/fPjh6iWl1uYt4T+/AqykJKfQv1OL/ktkLprmwQPnBlmT3fu9xTc3o9AA==
 
 "@types/rx-core-binding@*":
   version "4.0.4"
@@ -1787,6 +1797,14 @@ cli-cursor@^3.1.0:
   dependencies:
     restore-cursor "^3.1.0"
 
+cli-progress@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/cli-progress/-/cli-progress-3.9.0.tgz#25db83447deb812e62d05bac1af9aec5387ef3d4"
+  integrity sha512-g7rLWfhAo/7pF+a/STFH/xPyosaL1zgADhI0OM83hl3c7S43iGvJWEAV2QuDOnQ8i6EMBj/u4+NTd0d5L+4JfA==
+  dependencies:
+    colors "^1.1.2"
+    string-width "^4.2.0"
+
 cli-width@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-3.0.0.tgz#a2f48437a2caa9a22436e794bf071ec9e61cedf6"
@@ -1871,6 +1889,11 @@ colorette@^1.2.2:
   resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.2.2.tgz#cbcc79d5e99caea2dbf10eb3a26fd8b3e6acfa94"
   integrity sha512-MKGMzyfeuutC/ZJ1cba9NqcNpfeqMUcYmyF1ZFY6/Cn7CNSAKx6a+s48sqLqyAiZuaP2TcqMhoo+dlwFnVxT9w==
 
+colors@^1.1.2:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/colors/-/colors-1.4.0.tgz#c50491479d4c1bdaed2c9ced32cf7c7dc2360f78"
+  integrity sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==
+
 combined-stream@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
@@ -1878,7 +1901,7 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^2.20.0:
+commander@^2.20.0, commander@^2.6.0:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
@@ -3210,6 +3233,11 @@ isarray@1.0.0, isarray@^1.0.0, isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
   integrity sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
+
+isbinaryfile@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/isbinaryfile/-/isbinaryfile-4.0.8.tgz#5d34b94865bd4946633ecc78a026fc76c5b11fcf"
+  integrity sha512-53h6XFniq77YdW+spoRrebh0mnmTxRPTlcuIArO57lmMdq4uBKFKaeTjnb92oYWrSn/LVL+LT+Hap2tFQj8V+w==
 
 isexe@^2.0.0:
   version "2.0.0"
@@ -4859,6 +4887,14 @@ regex-not@^1.0.0, regex-not@^1.0.2:
   dependencies:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
+
+relaxed-json@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/relaxed-json/-/relaxed-json-1.0.3.tgz#eb2101ae0ee60e82267d95ed0ddf19a3604b8c1e"
+  integrity sha512-b7wGPo7o2KE/g7SqkJDDbav6zmrEeP4TK2VpITU72J/M949TLe/23y/ZHJo+pskcGM52xIfFoT9hydwmgr1AEg==
+  dependencies:
+    chalk "^2.4.2"
+    commander "^2.6.0"
 
 release-zalgo@^1.0.0:
   version "1.0.0"

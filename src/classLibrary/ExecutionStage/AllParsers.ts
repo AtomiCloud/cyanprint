@@ -1,31 +1,28 @@
-import { IParsingStrategy, 
-    VirtualFileSystemInstance,
-    CyanSafe
-} from "./interfaces/interfaces";
+import { CyanSafe, IParsingStrategy, VirtualFileSystemInstance, } from "../interfaces/interfaces";
 import chalk from "chalk";
-import { GuidResolver } from "./ParsingStrategies/GuidResolver";
-import { IfElseResolver } from "./ParsingStrategies/IfElseResolver";
-import { InlineFlagResolver } from "./ParsingStrategies/InlineFlagResolver";
-import { VariableResolver } from "./ParsingStrategies/VariableResolver";
-import { Utility } from "./Utility/Utility";
+import { GuidResolver } from "../ParsingStrategies/GuidResolver";
+import { IfElseResolver } from "../ParsingStrategies/IfElseResolver";
+import { InlineFlagResolver } from "../ParsingStrategies/InlineFlagResolver";
+import { VariableResolver } from "../ParsingStrategies/VariableResolver";
+import { Utility } from "../Utility/Utility";
 import { Bar, Presets } from "cli-progress";
 
-//taken from kirinnee/CyanPrint (to be edited later if needed)
-class Parser {
+class AllParsers {
+
 	private flagCounter: Map<string, number>;
 	private variableCounter: Map<string, number>;
 	private guidCounter: Map<string, number>;
 	private readonly strategies: IParsingStrategy[];
 	private readonly settings: CyanSafe;
 	private readonly util: Utility;
-	
-	constructor(util: Utility, strategies: IParsingStrategy[], settings: CyanSafe) {
+
+	constructor(util: Utility, strategies: IParsingStrategy[], cyanSafe: CyanSafe) {
 		this.strategies = strategies;
-		this.settings = settings;
+		this.settings = cyanSafe;
 		this.util = util;
-		this.flagCounter = util.FlattenBooleanValueObject(settings.flags).MapValue(() => 0);
-		this.variableCounter = util.FlattenStringValueObject(settings.variable).MapValue(() => 0);
-		this.guidCounter = settings.guid.AsKey((() => 0));
+		this.flagCounter = util.FlattenBooleanValueObject(cyanSafe.flags).MapValue(() => 0);
+		this.variableCounter = util.FlattenStringValueObject(cyanSafe.variable).MapValue(() => 0);
+		this.guidCounter = cyanSafe.guid.AsKey(() => 0);
 	}
 	
 	ParseFiles(files: VirtualFileSystemInstance[]): VirtualFileSystemInstance[] {
@@ -36,7 +33,7 @@ class Parser {
 		return files;
 	}
 	
-	private CountFiles(files: VirtualFileSystemInstance[]): void {
+	CountFiles(files: VirtualFileSystemInstance[]): void {
 		for (let i = 0; i < this.strategies.length; i++) {
 			let strategy = this.strategies[i];
 			switch (typeof(strategy)) {
@@ -141,7 +138,7 @@ class Parser {
 		}
 		return ret;
 	}
-	
+
 	WarnOfZeroOccurence(type: string, variables: string[]) {
 		if (variables.length > 0) {
 			console.log(chalk.redBright(`[Warning] The following ${type} do not exist in the template`));
@@ -149,3 +146,5 @@ class Parser {
 		}
 	}
 }
+
+export { AllParsers };

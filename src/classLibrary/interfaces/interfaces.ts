@@ -111,20 +111,29 @@ interface Ignore {
     custom: object; // Reserved for custom parsing strategies from plugins
 }
 
-// TODO may need further review
-interface IGlobFactory {
-    GenerateFiles(glob: Glob, target: string): IFileSystemInstanceMetadata[];
-
-    // Callback is used to bump progress
-    ReadFiles(files: IFileSystemInstanceMetadata[], callback?: Function): Promise<FileSystemInstance[]>;
+interface GlobSyncOptions {
+    dot?: boolean,
+    ignore?: string | string[]
 }
 
-// TODO may need further review
-interface IFileFactory {
-    CreateFileSystemInstance(relativePath: string, from?: string, to?: string): IFileSystemInstanceMetadata;
+interface IGlobFactory {
+    GenerateFiles(glob: GlobSafe, targetDirFromDestRoot?: string): VirtualFileSystemInstance[];
 
     // Callback is used to bump progress
-    ReadFile(file: IFileSystemInstanceMetadata, callback?: Function): Promise<FileSystemInstance>;
+    ReadFiles(files: VirtualFileSystemInstance[]): Promise<VirtualFileSystemInstance[]>;
+}
+
+interface IFileFactory {
+    ToRoot: string;
+    FromRoot: string;
+
+    CreateFileSystemInstance(relativePath: string, from?: string, to?: string, ignore?: Ignore): VirtualFileSystemInstance;
+
+    // Callback is used to bump progress
+    ReadFile(file: VirtualFileSystemInstance, callback?: Function): Promise<VirtualFileSystemInstance>;
+
+    GetAbsoluteFilePathsOfFileInDestinationPath(fileName: string, fromRoot?: string, pattern?: string, ignore?: string | string[]): string[]
+
 }
 
 // ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ██╗ ██████╗
@@ -183,6 +192,7 @@ interface IEvaluator {
 export {
     Glob,
     GlobSafe,
+    GlobSyncOptions,
     Syntax,
     CyanFlag,
     CyanVariable,
